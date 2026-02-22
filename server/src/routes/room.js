@@ -1,0 +1,92 @@
+/**
+ * 房型 / 订房相关路由
+ */
+
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+
+const router = express.Router();
+const prisma = new PrismaClient();
+
+/**
+ * GET /api/room-types
+ * 查询可订房型（按入住/离店日期）
+ * Query: checkin, checkout, hasDiscount
+ */
+router.get('/room-types', async (req, res) => {
+  try {
+    const { checkin, checkout, hasDiscount } = req.query;
+    if (!checkin || !checkout) {
+      return res.status(400).json({ message: '缺少 checkin 或 checkout 参数' });
+    }
+
+    const roomTypes = await prisma.roomType.findMany({
+      orderBy: { price: 'asc' },
+    });
+
+    const list = roomTypes.map((rt) => ({
+      id: rt.id,
+      name: rt.name,
+      bedType: rt.bedType,
+      maxOccupancy: rt.maxOccupancy,
+      price: Number(rt.price),
+      discountPrice: Number(rt.discountPrice),
+      displayPrice: hasDiscount === 'true' ? Number(rt.discountPrice) : Number(rt.price),
+    }));
+
+    res.json({ list });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '服务器错误' });
+  }
+});
+
+/**
+ * POST /api/orders
+ * 创建订单
+ */
+router.post('/orders', async (req, res) => {
+  try {
+    const {
+      roomTypeId,
+      checkin,
+      checkout,
+      nights,
+      pricePerNight,
+      totalAmount,
+      guestName,
+      guestPhone,
+      arriveTime,
+      remark,
+      userId,
+    } = req.body;
+
+    if (!roomTypeId || !checkin || !checkout || !guestName || !guestPhone) {
+      return res.status(400).json({ message: '缺少必填参数' });
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        userId: userId || null,
+        roomTypeId: Number(roomTypeId),
+        checkinDate: new Date(checkin),
+        checkoutDate: new Date(checkout),
+        nights: Number(nights),
+        pricePerNight,
+        totalAmount,
+        guestName,
+        guestPhone,
+        arriveTime: arriveTime || null,
+        remark: remark || null,
+        status: 'pending',
+      },
+    });
+
+    res.json({ id: order.id, message: '订单提交成功' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '服务器错误' });
+  }
+});
+
+module.exports = router;

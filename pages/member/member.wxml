@@ -1,0 +1,24 @@
+<view class="container tab-page">
+  <view class="card list">
+    <view class="list-item" bindtap="goWorkOrders">
+      <text>查看工单状态</text>
+      <text class="arrow">›</text>
+    </view>
+    <view class="list-item" bindtap="goOrders">
+      <text>查看订单</text>
+      <text class="arrow">›</text>
+    </view>
+    <view class="list-item" bindtap="goInvoices">
+      <text>查看发票</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="mall-entry" bindtap="goMall">
+      <text class="mall-title">商城入口</text>
+      <text class="mall-desc">精选好物</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+</view>

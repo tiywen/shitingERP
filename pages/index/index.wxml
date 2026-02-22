@@ -1,0 +1,50 @@
+<view class="container tab-page">
+  <view class="card">
+    <view class="section-title">选择入住与离店日期</view>
+    <view class="date-row">
+      <picker mode="date" value="{{checkinDate}}" start="{{minDate}}" bindchange="onCheckinChange">
+        <view class="picker-cell">
+          <text class="picker-label">入住</text>
+          <text class="picker-value">{{checkinDate}}</text>
+        </view>
+      </picker>
+      <view class="date-divider">至</view>
+      <picker mode="date" value="{{checkoutDate}}" start="{{minCheckoutDate}}" bindchange="onCheckoutChange">
+        <view class="picker-cell">
+          <text class="picker-label">离店</text>
+          <text class="picker-value">{{checkoutDate}}</text>
+        </view>
+      </picker>
+    </view>
+    <view wx:if="{{nights > 0}}" class="nights-tip">共 {{nights}} 晚</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">可订房型</view>
+    <view
+      wx:for="{{roomTypes}}"
+      wx:key="id"
+      class="room-item"
+      data-id="{{item.id}}"
+      data-name="{{item.name}}"
+      data-price="{{item.displayPrice}}"
+      data-bedtype="{{item.bedType}}"
+      data-maxoccupancy="{{item.maxOccupancy}}"
+      bindtap="goBooking"
+    >
+      <view class="room-main">
+        <view class="room-name">{{item.name}}</view>
+        <view class="room-meta">
+          <text class="meta-item">{{item.bedType}}</text>
+          <text class="meta-divider">|</text>
+          <text class="meta-item">可住{{item.maxOccupancy}}人</text>
+        </view>
+      </view>
+      <view class="room-price">
+        <text class="price-num">¥{{item.displayPrice}}</text>
+        <text class="price-unit">/晚</text>
+      </view>
+    </view>
+    <view wx:if="{{roomTypes.length === 0}}" class="empty-tip">暂无可用房型</view>
+  </view>
+</view>

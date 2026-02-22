@@ -1,0 +1,2 @@
+.section-title { font-size: 32rpx; font-weight: 500; margin-bottom: 24rpx; }
+.desc { color: var(--text-secondary); font-size: 28rpx; }

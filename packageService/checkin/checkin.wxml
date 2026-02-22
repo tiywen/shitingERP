@@ -1,0 +1,6 @@
+<view class="container">
+  <view class="card">
+    <text>添加入住人、微信邀请入住人、开发票</text>
+    <text class="tip">（功能开发中）</text>
+  </view>
+</view>

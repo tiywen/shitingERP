@@ -1,0 +1,42 @@
+<view class="container tab-page">
+  <view class="section">
+    <view class="section-title">入住服务</view>
+    <view class="card card-click" bindtap="goCheckIn">
+      <text>{{hasActiveOrder ? '添加入住人、微信邀请、开发票' : '查看入住教程'}}</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">工单服务</view>
+    <view class="card grid">
+      <view
+        wx:for="{{workOrderTypes}}"
+        wx:key="id"
+        class="grid-item"
+        data-id="{{item.id}}"
+        bindtap="goWorkOrder"
+      >
+        <text class="grid-icon">{{item.icon}}</text>
+        <text class="grid-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">石亭设施</view>
+    <view class="card list">
+      <view
+        wx:for="{{facilities}}"
+        wx:key="id"
+        class="list-item"
+        data-id="{{item.id}}"
+        data-type="{{item.type}}"
+        bindtap="goFacility"
+      >
+        <text>{{item.name}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+</view>

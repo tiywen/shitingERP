@@ -1,0 +1,156 @@
+// 石亭 ERP 数据库模型
+// 使用 MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 用户 ============
+// 业主、院友、访客统一用 role 区分
+model User {
+  id         Int      @id @default(autoincrement())
+  openid     String?  @unique // 微信 openid
+  role       String   @default("visitor") // owner | member | visitor
+  name       String?  // 姓名（代号）
+  phone      String?
+
+  // 业主字段
+  ownerCode   String?  // 业主识别编号
+  houseNumber String?  // 关联户号
+
+  // 院友字段
+  memberCode String?  // 会员编号
+  ownerId    Int?     // 关联业主
+  owner      User?    @relation("MemberToOwner", fields: [ownerId], references: [id])
+  members    User[]   @relation("MemberToOwner")
+
+  // 访客字段
+  visitorCode String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders          Order[]
+  workOrders      WorkOrder[]
+  facilityBookings FacilityBooking[]
+  invoices        Invoice[]
+}
+
+// ============ 房型 ============
+model RoomType {
+  id           Int      @id @default(autoincrement())
+  name         String   // 房型名称
+  bedType      String   // 床型：大床、双床、大床+沙发床 等
+  maxOccupancy Int      @default(2) // 可住人数
+  price        Decimal  @db.Decimal(10, 2) // 原价/晚
+  discountPrice Decimal @db.Decimal(10, 2) // 业主/院友折扣价/晚
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders   Order[]
+  rooms    Room[]
+}
+
+// ============ 物理房间（用于工单关联） ============
+model Room {
+  id          Int      @id @default(autoincrement())
+  roomNo      String   // 房间号
+  roomTypeId  Int
+  roomType    RoomType @relation(fields: [roomTypeId], references: [id])
+  houseNumber String?  // 关联户号（业主房间）
+
+  workOrders WorkOrder[]
+}
+
+// ============ 订单 ============
+model Order {
+  id            Int      @id @default(autoincrement())
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
+  roomTypeId    Int
+  roomType      RoomType @relation(fields: [roomTypeId], references: [id])
+
+  checkinDate   DateTime @db.Date
+  checkoutDate  DateTime @db.Date
+  nights        Int
+  pricePerNight Decimal  @db.Decimal(10, 2)
+  totalAmount   Decimal  @db.Decimal(10, 2)
+
+  guestName     String
+  guestPhone    String
+  arriveTime    String?  // 预计到店时间
+  remark        String?  @db.Text
+
+  status        String   @default("pending") // pending | confirmed | checked_in | checked_out | cancelled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
+
+  @@map("orders")
+}
+
+// ============ 工单 ============
+model WorkOrder {
+  id      Int     @id @default(autoincrement())
+  userId  Int
+  user    User    @relation(fields: [userId], references: [id])
+  roomId  Int?    // 可为空，有多个关联房间时可选择
+  room    Room?   @relation(fields: [roomId], references: [id])
+
+  type    String  // heating | ventilation | repair | delivery | other
+  status  String  @default("submitted") // submitted | in_progress | completed
+  content String? @db.Text // 描述内容
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============ 设施 ============
+model Facility {
+  id          Int     @id @default(autoincrement())
+  name        String  // 停车场、餐厅、K歌房、洗衣房、匹克球场
+  type        String  // static | booking
+  description String? @db.Text // 静态介绍内容
+
+  bookings FacilityBooking[]
+}
+
+// ============ 设施预约 ============
+model FacilityBooking {
+  id         Int      @id @default(autoincrement())
+  facilityId Int
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+
+  bookingDate DateTime @db.Date
+  timeSlot    String   // 时间段
+
+  status     String   @default("pending") // pending | confirmed | cancelled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============ 发票 ============
+model Invoice {
+  id      Int     @id @default(autoincrement())
+  orderId Int?
+  order   Order?  @relation(fields: [orderId], references: [id])
+  userId  Int
+  user    User    @relation(fields: [userId], references: [id])
+
+  amount  Decimal @db.Decimal(10, 2)
+  status  String  @default("pending")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

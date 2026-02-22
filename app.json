@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/booking/booking",
+    "pages/service/service",
+    "pages/member/member"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#1a5f4a",
+    "navigationBarTitleText": "石亭",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#1a5f4a",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "订房" },
+      { "pagePath": "pages/service/service", "text": "服务" },
+      { "pagePath": "pages/member/member", "text": "会员" }
+    ]
+  },
+  "subpackages": [
+    {
+      "root": "packageService",
+      "name": "service",
+      "pages": [
+        "checkin/checkin",
+        "checkin-tutorial/checkin-tutorial",
+        "work-order/work-order",
+        "facility-detail/facility-detail",
+        "facility-booking/facility-booking"
+      ]
+    },
+    {
+      "root": "packageMember",
+      "name": "member",
+      "pages": [
+        "work-orders/work-orders",
+        "orders/orders",
+        "invoices/invoices"
+      ]
+    }
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,70 @@
+<view class="container" style="padding-bottom: 220rpx;">
+  <view class="confirm-bar">
+    <text class="confirm-room">{{roomName}}</text>
+    <view wx:if="{{bedType || maxOccupancy}}" class="confirm-meta">
+      <text wx:if="{{bedType}}">{{bedType}}</text>
+      <text wx:if="{{bedType && maxOccupancy}}"> · </text>
+      <text wx:if="{{maxOccupancy}}">可住{{maxOccupancy}}人</text>
+    </view>
+    <view class="confirm-dates">
+      <text class="confirm-date">{{checkin}} 至 {{checkout}}</text>
+      <text class="confirm-nights">共 {{nights}} 晚</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="form-item">
+      <text class="label">住客姓名 <text class="required">*</text></text>
+      <input
+        class="input"
+        placeholder="请输入住客姓名"
+        value="{{form.guestName}}"
+        data-field="guestName"
+        bindinput="onInput"
+      />
+    </view>
+    <view class="form-item">
+      <text class="label">联系电话 <text class="required">*</text></text>
+      <input
+        class="input"
+        type="number"
+        placeholder="请输入联系电话"
+        value="{{form.phone}}"
+        data-field="phone"
+        bindinput="onInput"
+      />
+    </view>
+    <view class="form-item">
+      <text class="label">预计到店时间 <text class="required">*</text></text>
+      <picker mode="time" value="{{form.arriveTime}}" bindchange="onArriveTimeChange">
+        <view class="picker-value {{form.arriveTime ? '' : 'placeholder'}}">
+          {{form.arriveTime || '请选择到店时间'}}
+        </view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="label">备注</text>
+      <textarea
+        class="textarea"
+        placeholder="选填"
+        value="{{form.remark}}"
+        data-field="remark"
+        bindinput="onInput"
+      />
+    </view>
+  </view>
+
+  <view class="policy card">
+    <view class="policy-title">入住与取消政策</view>
+    <view class="policy-text">请以实际入住时酒店政策为准。</view>
+  </view>
+
+  <view class="footer">
+    <view class="total">
+      <text class="total-label">订单金额</text>
+      <text class="total-detail">¥{{pricePerNight}}/晚 × {{nights}}晚</text>
+      <text class="total-price">¥{{totalPrice}}</text>
+    </view>
+    <button class="btn-submit" bindtap="submit">提交订单</button>
+  </view>
+</view>

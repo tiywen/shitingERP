@@ -1,0 +1,6 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">入住流程说明</view>
+    <text class="desc">请先完成订房，待订单确认后可在此进行入住相关操作。</text>
+  </view>
+</view>
