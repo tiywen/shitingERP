@@ -15,9 +15,10 @@ datasource db {
 model User {
   id         Int      @id @default(autoincrement())
   openid     String?  @unique // 微信 openid
+  nickname   String?  // 微信昵称
   role       String   @default("visitor") // owner | member | visitor
   name       String?  // 姓名（代号）
-  phone      String?
+  phone      String?  // 手机号（登录用）
 
   // 业主字段
   ownerCode   String?  // 业主识别编号

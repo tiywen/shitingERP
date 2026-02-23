@@ -7,6 +7,7 @@ const HIDDEN = ['createdAt', 'updatedAt', 'roomType', 'user', 'order', 'facility
 const FIELD_LABELS = {
   id: 'ID',
   openid: '微信OpenID',
+  nickname: '微信昵称',
   role: '角色',
   name: '姓名',
   phone: '手机号',
