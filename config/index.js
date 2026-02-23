@@ -4,7 +4,7 @@
 
 module.exports = {
   /** API 基础地址（后续接入真实后端时配置） */
-  baseUrl: 'http://localhost:3000/api',
+  baseUrl: 'http://54.179.209.48:3000/api',
 
   /** 用户角色枚举 */
   USER_ROLE: {

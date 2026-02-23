@@ -23,6 +23,17 @@ function App() {
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <aside style={styles.sidebar}>
           <h2 style={styles.logo}>石亭 ERP</h2>
+          <div style={styles.apiIndicator}>
+            {(() => {
+              const target = import.meta.env.VITE_API_TARGET || '';
+              const isLocal = !target || target.includes('localhost');
+              return (
+                <span title={target || 'http://localhost:3000'} style={{ ...styles.apiBadge, ...(isLocal ? styles.apiLocal : styles.apiRemote) }}>
+                  {isLocal ? '本地' : '服务器'}
+                </span>
+              );
+            })()}
+          </div>
           <nav style={styles.nav}>
             {TABS.map((t) => (
               <NavLink
@@ -67,9 +78,26 @@ const styles = {
     padding: '24px 0',
   },
   logo: {
-    margin: '0 20px 24px',
+    margin: '0 20px 12px',
     fontSize: 20,
     fontWeight: 600,
+  },
+  apiIndicator: {
+    margin: '0 20px 16px',
+  },
+  apiBadge: {
+    display: 'inline-block',
+    fontSize: 11,
+    padding: '3px 8px',
+    borderRadius: 4,
+  },
+  apiLocal: {
+    background: 'rgba(255,255,255,0.2)',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  apiRemote: {
+    background: '#52c41a',
+    color: '#fff',
   },
   nav: {
     display: 'flex',
