@@ -1,0 +1,78 @@
+.loading-wrap,
+.empty-wrap {
+  text-align: center;
+  padding: 80rpx;
+  color: var(--text-placeholder);
+}
+
+.empty-tip {
+  font-size: 28rpx;
+}
+
+.order-list {
+  padding-bottom: 32rpx;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.room-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-confirmed {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-checked_in {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-checked_out {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.status-cancelled {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.order-info {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 16rpx;
+}
+
+.order-footer .amount {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+}

@@ -89,4 +89,55 @@ router.post('/orders', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/orders
+ * 获取用户订单列表
+ * Query: userId
+ */
+router.get('/orders', async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ message: '缺少 userId 参数' });
+    }
+
+    const orders = await prisma.order.findMany({
+      where: { userId: parseInt(userId, 10) },
+      include: {
+        roomType: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const statusMap = {
+      pending: '待确认',
+      confirmed: '已确认',
+      checked_in: '已入住',
+      checked_out: '已离店',
+      cancelled: '已取消',
+    };
+
+    const list = orders.map((o) => ({
+      id: o.id,
+      roomTypeName: o.roomType.name,
+      bedType: o.roomType.bedType,
+      maxOccupancy: o.roomType.maxOccupancy,
+      checkinDate: o.checkinDate.toISOString().slice(0, 10),
+      checkoutDate: o.checkoutDate.toISOString().slice(0, 10),
+      nights: o.nights,
+      totalAmount: Number(o.totalAmount),
+      guestName: o.guestName,
+      guestPhone: o.guestPhone,
+      status: o.status,
+      statusText: statusMap[o.status] || o.status,
+      createdAt: o.createdAt.toISOString(),
+    }));
+
+    res.json({ list });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '服务器错误' });
+  }
+});
+
 module.exports = router;

@@ -1,5 +1,28 @@
 <view class="container">
-  <view class="card">
-    <text>订单列表（功能开发中）</text>
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{empty}}" class="empty-wrap">
+    <text class="empty-tip">暂无订单</text>
+  </view>
+
+  <view wx:else class="order-list">
+    <view
+      wx:for="{{orders}}"
+      wx:key="id"
+      class="order-card"
+    >
+      <view class="order-header">
+        <text class="room-name">{{item.roomTypeName}}</text>
+        <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+      </view>
+      <view class="order-info">
+        <text>{{item.checkinDate}} 至 {{item.checkoutDate}} · {{item.nights}}晚</text>
+      </view>
+      <view class="order-footer">
+        <text class="amount">¥{{item.totalAmount}}</text>
+      </view>
+    </view>
   </view>
 </view>

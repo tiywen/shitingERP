@@ -56,6 +56,9 @@ Page({
       wx.showToast({ title: '请填写必填项', icon: 'none' });
       return;
     }
+    const app = getApp();
+    const userId = app.globalData.userInfo?.userId || app.globalData.userInfo?.id;
+
     wx.showLoading({ title: '提交中' });
     request({
       url: '/orders',
@@ -71,6 +74,7 @@ Page({
         guestPhone: form.phone,
         arriveTime: form.arriveTime,
         remark: form.remark || undefined,
+        userId: userId || undefined,
       },
     })
       .then(() => {
