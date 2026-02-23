@@ -39,6 +39,13 @@ shitingERP/
 │   │   └── routes/        # 接口路由
 │   ├── package.json
 │   └── .env               # 数据库连接等配置
+├── admin/                 # 后台管理网站 (React + Vite)
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── api.js
+│   │   └── pages/         # 订单(实时)、各表 CRUD
+│   ├── package.json
+│   └── vite.config.js
 ```
 
 ## 快速开始
@@ -58,6 +65,13 @@ shitingERP/
 4. `npm run db:generate && npm run db:push` 创建表结构
 5. `npm run db:seed` 初始化房型、设施数据
 6. `npm run dev` 启动后端（默认 http://localhost:3000）
+
+### 后台管理
+
+1. 确保后端已启动
+2. `cd admin && npm install`
+3. `npm run dev` 启动后台（默认 http://localhost:5174）
+4. 可查看、编辑所有数据表，订单列表每 5 秒自动刷新
 
 ## 用户与角色
 

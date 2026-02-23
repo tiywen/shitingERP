@@ -1,5 +1,35 @@
 <view class="container">
-  <view class="card">
-    <text>已提交、进行中、已完成（功能开发中）</text>
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{empty}}" class="empty-wrap">
+    <text class="empty-tip">暂无工单</text>
+  </view>
+
+  <view wx:else class="work-order-list">
+    <view
+      wx:for="{{list}}"
+      wx:key="id"
+      class="work-order-card"
+    >
+      <view class="card-header">
+        <text class="type-name">{{item.typeName}}</text>
+        <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+      </view>
+      <view wx:if="{{item.roomKind}}" class="card-row">
+        <text class="label">房间种类：</text>
+        <text>{{item.roomKind}}</text>
+      </view>
+      <view class="card-row">
+        <text class="label">服务要求：</text>
+        <text>{{item.content}}</text>
+      </view>
+      <view wx:if="{{item.adminRemark}}" class="card-row admin-remark">
+        <text class="label">管理备注：</text>
+        <text>{{item.adminRemark}}</text>
+      </view>
+      <view class="card-time">{{item.createdAtText || item.createdAt}}</view>
+    </view>
   </view>
 </view>

@@ -1,5 +1,51 @@
 <view class="container">
   <view class="card">
-    <text>工单提交（功能开发中）</text>
+    <view class="form-item">
+      <text class="label">用户名称</text>
+      <input class="input" value="{{userName}}" disabled placeholder="未登录" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">关联房屋</text>
+      <picker
+        wx:if="{{linkedRooms.length > 1}}"
+        mode="selector"
+        range="{{linkedRooms}}"
+        range-key="label"
+        value="{{selectedRoomIndex}}"
+        bindchange="onRoomPickerChange"
+      >
+        <view class="picker-value">{{linkedRooms[selectedRoomIndex].label}}</view>
+      </picker>
+      <input
+        wx:elif="{{linkedRooms.length === 1}}"
+        class="input"
+        value="{{linkedRooms[0].label}}"
+        disabled
+      />
+      <input wx:else class="input" value="暂无关联房屋" disabled />
+    </view>
+
+    <view class="form-item">
+      <text class="label">房间种类</text>
+      <input
+        class="input"
+        placeholder="{{roomKindPlaceholder}}"
+        value="{{roomKind}}"
+        bindinput="onRoomKindInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">服务要求</text>
+      <textarea
+        class="textarea"
+        placeholder="{{contentPlaceholder}}"
+        value="{{content}}"
+        bindinput="onContentInput"
+      />
+    </view>
+
+    <button class="btn-submit" bindtap="submit">提交</button>
   </view>
 </view>

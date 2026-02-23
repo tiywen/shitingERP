@@ -45,7 +45,7 @@ Page({
     }
   },
 
-  /** 工单服务 */
+  /** 生活服务 */
   goWorkOrder(e) {
     const { id } = e.currentTarget.dataset;
     wx.navigateTo({

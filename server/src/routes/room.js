@@ -22,17 +22,34 @@ router.get('/room-types', async (req, res) => {
 
     const roomTypes = await prisma.roomType.findMany({
       orderBy: { price: 'asc' },
+      include: { images: { orderBy: { sortOrder: 'asc' } } },
     });
 
-    const list = roomTypes.map((rt) => ({
-      id: rt.id,
-      name: rt.name,
-      bedType: rt.bedType,
-      maxOccupancy: rt.maxOccupancy,
-      price: Number(rt.price),
-      discountPrice: Number(rt.discountPrice),
-      displayPrice: hasDiscount === 'true' ? Number(rt.discountPrice) : Number(rt.price),
-    }));
+    const baseUrl = (req.protocol && req.get('host')) ? `${req.protocol}://${req.get('host')}` : '';
+    const hasDis = hasDiscount === 'true';
+    const list = roomTypes.map((rt) => {
+      const price = Number(rt.price);
+      const discountPrice = Number(rt.discountPrice);
+      const displayPrice = hasDis ? discountPrice : price;
+      const imageUrls = (rt.images || []).map((img) => `${baseUrl}/uploads/${img.path}`);
+      const imageUrl = imageUrls[0] || null;
+      return {
+        id: rt.id,
+        name: rt.name,
+        typeName: rt.typeName,
+        roomNo: rt.roomNo,
+        roomName: rt.roomName,
+        bedType: rt.bedType || '',
+        maxOccupancy: rt.maxOccupancy,
+        price,
+        discountPrice,
+        originalPrice: rt.originalPrice != null ? Number(rt.originalPrice) : price,
+        displayPrice,
+        hasDiscount: hasDis && discountPrice < price,
+        imageUrl,
+        imageUrls,
+      };
+    });
 
     res.json({ list });
   } catch (err) {

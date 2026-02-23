@@ -1,0 +1,79 @@
+.loading-wrap,
+.empty-wrap {
+  text-align: center;
+  padding: 80rpx;
+  color: var(--text-placeholder);
+}
+
+.empty-tip {
+  font-size: 28rpx;
+}
+
+.work-order-list {
+  padding-bottom: 32rpx;
+}
+
+.work-order-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.type-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-submitted {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-in_progress {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.card-row {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.card-row .label {
+  color: var(--text-placeholder);
+}
+
+.admin-remark {
+  background: #f8f9fa;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  margin-top: 16rpx;
+}
+
+.card-time {
+  font-size: 24rpx;
+  color: var(--text-placeholder);
+  margin-top: 16rpx;
+}

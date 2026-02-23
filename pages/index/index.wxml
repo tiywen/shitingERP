@@ -1,50 +1,99 @@
 <view class="container tab-page">
-  <view class="card">
-    <view class="section-title">选择入住与离店日期</view>
-    <view class="date-row">
-      <picker mode="date" value="{{checkinDate}}" start="{{minDate}}" bindchange="onCheckinChange">
-        <view class="picker-cell">
-          <text class="picker-label">入住</text>
-          <text class="picker-value">{{checkinDate}}</text>
-        </view>
-      </picker>
-      <view class="date-divider">至</view>
-      <picker mode="date" value="{{checkoutDate}}" start="{{minCheckoutDate}}" bindchange="onCheckoutChange">
-        <view class="picker-cell">
-          <text class="picker-label">离店</text>
-          <text class="picker-value">{{checkoutDate}}</text>
-        </view>
-      </picker>
+  <!-- 顶部：日期与客人数选择（携程风格） -->
+  <view class="header-block">
+    <view class="hotel-name">石亭书院</view>
+    <view class="promo-tags" wx:if="{{hasDiscount}}">
+      <text class="tag">订房优惠</text>
     </view>
-    <view wx:if="{{nights > 0}}" class="nights-tip">共 {{nights}} 晚</view>
+    <view class="date-guest-row">
+      <picker mode="date" value="{{checkinDate}}" start="{{minDate}}" bindchange="onCheckinChange">
+        <view class="date-cell">
+          <text class="date-weekday">{{checkinWeekday}}</text>
+          <text class="date-main">{{checkinDisplay}}</text>
+        </view>
+      </picker>
+      <view class="date-arrow">—</view>
+      <picker mode="date" value="{{checkoutDate}}" start="{{minCheckoutDate}}" bindchange="onCheckoutChange">
+        <view class="date-cell">
+          <text class="date-weekday">{{checkoutWeekday}}</text>
+          <text class="date-main">{{checkoutDisplay}}</text>
+        </view>
+      </picker>
+      <text class="nights-badge">共{{nights}}晚</text>
+    </view>
+    <view class="guest-row">
+      <text class="guest-text">{{adultCount}}人入住</text>
+    </view>
   </view>
 
-  <view class="card">
-    <view class="section-title">可订房型</view>
+  <!-- 房型筛选标签 -->
+  <scroll-view class="filter-bar" scroll-x enable-flex>
     <view
-      wx:for="{{roomTypes}}"
+      wx:for="{{bedTypeFilters}}"
+      wx:key="value"
+      class="filter-chip {{selectedBedType === item.value ? 'active' : ''}}"
+      data-value="{{item.value}}"
+      bindtap="onFilterTap"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- 房型列表（卡片式） -->
+  <view class="room-list">
+    <view
+      wx:for="{{filteredRoomTypes}}"
       wx:key="id"
-      class="room-item"
+      class="room-card"
       data-id="{{item.id}}"
-      data-name="{{item.name}}"
+      data-name="{{item.displayName}}"
       data-price="{{item.displayPrice}}"
       data-bedtype="{{item.bedType}}"
       data-maxoccupancy="{{item.maxOccupancy}}"
       bindtap="goBooking"
     >
-      <view class="room-main">
-        <view class="room-name">{{item.name}}</view>
-        <view class="room-meta">
-          <text class="meta-item">{{item.bedType}}</text>
-          <text class="meta-divider">|</text>
-          <text class="meta-item">可住{{item.maxOccupancy}}人</text>
+      <view class="room-card-inner">
+        <view
+          class="room-img-wrap"
+          catchtap="previewRoomImages"
+          data-urls="{{item.imageUrls}}"
+          data-current="{{item.imageUrl}}"
+        >
+          <block wx:if="{{item.imageUrl}}">
+            <image class="room-img" src="{{item.imageUrl}}" mode="aspectFill" />
+          </block>
+          <view wx:else class="room-img room-img-placeholder">
+            <text class="room-img-text">房型图</text>
+          </view>
+          <view class="room-img-badge" wx:if="{{item.hasDiscount}}">会员价</view>
+          <view class="room-img-preview-hint" wx:if="{{item.imageUrls && item.imageUrls.length > 0}}">点击查看{{item.imageUrls.length}}张图</view>
+        </view>
+        <view class="room-info">
+          <view class="room-title">{{item.displayName}}</view>
+          <view class="room-id" wx:if="{{item.roomNo}}">{{item.roomNo}}</view>
+          <view class="room-meta">
+            <text wx:if="{{item.bedType}}">{{item.bedType}}</text>
+            <text wx:if="{{item.bedType && item.maxOccupancy}}"> · </text>
+            <text wx:if="{{item.maxOccupancy}}">可住{{item.maxOccupancy}}人</text>
+          </view>
+          <view class="room-policy">入住当天18:00前可免费取消</view>
+          <view class="room-bottom">
+            <view class="room-price-wrap">
+              <text class="price-original" wx:if="{{item.hasDiscount && item.originalPrice > item.displayPrice}}">¥{{item.originalPrice}}</text>
+              <text class="price-current">¥{{item.displayPrice}}</text>
+              <text class="price-unit">/晚</text>
+            </view>
+            <view class="btn-book">立即预订</view>
+          </view>
         </view>
       </view>
-      <view class="room-price">
-        <text class="price-num">¥{{item.displayPrice}}</text>
-        <text class="price-unit">/晚</text>
-      </view>
     </view>
-    <view wx:if="{{roomTypes.length === 0}}" class="empty-tip">暂无可用房型</view>
+    <view wx:if="{{filteredRoomTypes.length === 0}}" class="empty-tip">暂无可用房型</view>
+  </view>
+
+  <!-- 底部悬浮：问酒店 -->
+  <view class="float-contact" bindtap="onContact">
+    <view class="float-icon-wrap">
+      <text class="float-icon">💬</text>
+    </view>
+    <text class="float-text">问酒店</text>
   </view>
 </view>

@@ -1,4 +1,19 @@
 <view class="container tab-page">
+  <view class="card user-status">
+    <view class="status-row">
+      <text class="status-label">登录状态</text>
+      <text class="status-value {{isLoggedIn ? 'active' : ''}}">{{isLoggedIn ? '已登录' : '未登录'}}</text>
+    </view>
+    <view class="status-row">
+      <text class="status-label">会员种类</text>
+      <text class="status-value">{{roleLabel}}</text>
+    </view>
+    <view wx:if="{{userName}}" class="status-row">
+      <text class="status-label">昵称/手机</text>
+      <text class="status-value">{{userName}}</text>
+    </view>
+  </view>
+
   <view class="card list">
     <view class="list-item" bindtap="goWorkOrders">
       <text>查看工单状态</text>

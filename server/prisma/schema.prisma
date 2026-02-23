@@ -45,16 +45,45 @@ model User {
 model RoomType {
   id           Int      @id @default(autoincrement())
   name         String   // 房型名称
-  bedType      String   // 床型：大床、双床、大床+沙发床 等
+  bedType      String   @default("") // 床型
   maxOccupancy Int      @default(2) // 可住人数
   price        Decimal  @db.Decimal(10, 2) // 原价/晚
   discountPrice Decimal @db.Decimal(10, 2) // 业主/院友折扣价/晚
+
+  // Excel 导入字段
+  roomNo              String?  // 房号
+  typeName            String?  @map("type_name") // 房型
+  roomName            String?  @map("room_name") // 客房名称
+  memberWeekdayPrice  Decimal? @db.Decimal(10, 2) @map("member_weekday_price") // 会员平日价
+  memberWeekendPrice  Decimal? @db.Decimal(10, 2) @map("member_weekend_price") // 会员假日价
+  platformWeekdayPrice Decimal? @db.Decimal(10, 2) @map("platform_weekday_price") // 平台平日价
+  platformWeekendPrice Decimal? @db.Decimal(10, 2) @map("platform_weekend_price") // 平台假日价
+  specialHolidayPrice Decimal? @db.Decimal(10, 2) @map("special_holiday_price") // 特殊节假日
+  platformPromoWeekday Decimal? @db.Decimal(10, 2) @map("platform_promo_weekday") // 平台推广平日价
+  platformPromoWeekend Decimal? @db.Decimal(10, 2) @map("platform_promo_weekend") // 平台推广假日价
+  originalPrice       Decimal? @db.Decimal(10, 2) @map("original_price") // 原价
+  descriptionZh       String?  @db.Text @map("description_zh") // 房型说明(中)
+  descriptionEn       String?  @db.Text @map("description_en") // 房型说明(英)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   orders   Order[]
   rooms    Room[]
+  images   RoomTypeImage[]
+}
+
+// ============ 房型图（每房型最多 10 张） ============
+model RoomTypeImage {
+  id         Int      @id @default(autoincrement())
+  roomTypeId Int
+  roomType   RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  path       String   // 存储路径，如 room-types/1/xxx.jpg
+  sortOrder  Int      @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now())
+
+  @@map("room_type_images")
 }
 
 // ============ 物理房间（用于工单关联） ============
@@ -105,9 +134,11 @@ model WorkOrder {
   roomId  Int?    // 可为空，有多个关联房间时可选择
   room    Room?   @relation(fields: [roomId], references: [id])
 
-  type    String  // heating | ventilation | repair | delivery | other
-  status  String  @default("submitted") // submitted | in_progress | completed
-  content String? @db.Text // 描述内容
+  type        String  // heating | ventilation | repair | delivery | other
+  status      String  @default("submitted") // submitted | in_progress | completed
+  roomKind    String? // 房间种类（客厅、一楼卧室等）
+  content     String? @db.Text // 服务要求描述
+  adminRemark String? @db.Text // 管理备注（如：x月x日已处理）
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

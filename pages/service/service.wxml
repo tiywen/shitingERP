@@ -8,7 +8,7 @@
   </view>
 
   <view class="section">
-    <view class="section-title">工单服务</view>
+    <view class="section-title">生活服务</view>
     <view class="card grid">
       <view
         wx:for="{{workOrderTypes}}"
