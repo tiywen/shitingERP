@@ -1,0 +1,70 @@
+<view class="container">
+  <view class="card">
+    <view class="form-item">
+      <text class="label">预约类型</text>
+      <text class="readonly">{{bookingTypeLabel}}</text>
+    </view>
+
+    <view class="form-item">
+      <text class="label">预约日期</text>
+      <picker
+        mode="selector"
+        range="{{dateOptions}}"
+        range-key="label"
+        value="{{dateIndex}}"
+        bindchange="onDateChange"
+      >
+        <view class="picker-value">{{dateDisplay}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">餐次</text>
+      <picker
+        mode="selector"
+        range="{{mealOptions}}"
+        range-key="label"
+        value="{{mealIndex}}"
+        bindchange="onMealChange"
+      >
+        <view class="picker-value">{{mealDisplay}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">预约时间</text>
+      <picker
+        mode="selector"
+        range="{{timeSlotOptions}}"
+        range-key="label"
+        value="{{timeSlotIndex}}"
+        bindchange="onTimeSlotChange"
+      >
+        <view class="picker-value">{{timeSlotDisplay}}</view>
+      </picker>
+    </view>
+
+    <view wx:if="{{mealFull}}" class="tip-full">对不起，预约已满</view>
+
+    <view class="form-item">
+      <text class="label">人数{{type === 'table' ? '（10 人起）' : ''}}</text>
+      <view class="stepper">
+        <button class="stepper-btn" bindtap="minusHeadcount" disabled="{{headcount <= minHeadcount}}">－</button>
+        <text class="stepper-num">{{headcount}}</text>
+        <button class="stepper-btn" bindtap="plusHeadcount" disabled="{{headcount >= maxHeadcount}}">＋</button>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="label">备注（选填）</text>
+      <textarea
+        class="textarea"
+        placeholder="特殊需求可在此填写"
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+      />
+    </view>
+
+    <button class="btn-submit" bindtap="submit" loading="{{submitting}}" disabled="{{mealFull}}">提交预约</button>
+  </view>
+</view>

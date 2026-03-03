@@ -1,0 +1,28 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text>加载中...</text>
+  </view>
+  <view wx:elif="{{empty}}" class="empty-wrap">
+    <text class="empty-tip">暂无预约</text>
+  </view>
+  <view wx:else class="list">
+    <view
+      wx:for="{{list}}"
+      wx:key="id"
+      class="card"
+    >
+      <view class="row">
+        <text class="facility-name">{{item.facilityName}}</text>
+        <text class="status-tag status-{{item.status}}">{{item.statusLabel}}</text>
+      </view>
+      <view class="row date-row">
+        <text class="date">{{item.date}}</text>
+        <text class="time">{{item.timeSlot}}</text>
+      </view>
+      <view wx:if="{{item.mealLabel}}" class="row label">
+        {{item.mealLabel}} · {{item.bookingTypeLabel}} · {{item.headcount}}人
+      </view>
+      <view wx:if="{{item.remark}}" class="remark">{{item.remark}}</view>
+    </view>
+  </view>
+</view>

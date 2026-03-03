@@ -50,6 +50,67 @@ shitingERP/
 
 ## 快速开始
 
+### 本地运行（推荐先看这里）
+
+在本地跑通后端 + 小程序模拟器，按下面顺序做一遍即可。
+
+**1. 准备 MySQL**
+
+- 安装 MySQL（如 8.0），启动服务
+- 创建数据库：`CREATE DATABASE shiting_erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+
+**2. 后端**
+
+```bash
+cd server
+cp .env.example .env    # 已有 .env 可跳过
+```
+
+编辑 `server/.env`：
+
+- `DATABASE_URL` 改成你的连接串，例如：`mysql://root:你的密码@localhost:3306/shiting_erp`
+- `PORT` 保持 `3000` 或改成你想要的端口（后面小程序 baseUrl 要和这里一致）
+
+然后执行：
+
+```bash
+npm install
+npm run db:generate
+npm run db:push        # 建表
+npm run db:seed        # 初始化房型、设施等
+npm run dev            # 启动，默认 http://localhost:3000
+```
+
+看到「后端已启动」后，在浏览器访问 `http://localhost:3000/api/health` 应返回 `{"ok":true,...}`。
+
+**3. 小程序指向本地**
+
+编辑项目根目录下的 `config/index.js`，把 `baseUrl` 改成你本机后端地址（注意端口要和 server 的 PORT 一致）：
+
+```javascript
+baseUrl: 'http://localhost:3000/api',   // 若 PORT=3001 则改为 3001
+```
+
+- 在**微信开发者工具**里打开本项目，编译运行即可；模拟器会请求本机后端。
+- 若用**真机预览**，需把 `localhost` 改成你电脑的局域网 IP（如 `http://192.168.1.100:3000/api`），并保证手机和电脑在同一 WiFi。
+
+**4. 后台管理（可选）**
+
+```bash
+cd admin
+npm install
+```
+
+在 `admin/.env` 里设置 `VITE_API_TARGET=http://localhost:3000`（端口与后端一致），然后：
+
+```bash
+npm run dev
+```
+
+浏览器打开控制台里提示的地址（一般为 http://localhost:5174）即可管理数据。
+
+---
+
 ### 小程序
 
 1. 使用微信开发者工具打开本项目

@@ -9,6 +9,8 @@ const roomRoutes = require('./routes/room');
 const authRoutes = require('./routes/auth');
 const workOrderRoutes = require('./routes/workOrder');
 const adminRoutes = require('./routes/admin');
+const restaurantRoutes = require('./routes/restaurant');
+const facilityRoutes = require('./routes/facility');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +26,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api', authRoutes);
 app.use('/api', roomRoutes);
 app.use('/api/work-orders', workOrderRoutes);
+app.use('/api/facilities/restaurant', restaurantRoutes);
+app.use('/api/facilities', facilityRoutes);
 app.use('/api/admin', adminRoutes);
 
 // 健康检查

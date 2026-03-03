@@ -200,6 +200,10 @@ Page({
     wx.navigateTo({ url: '/packageMember/orders/orders' });
   },
 
+  goMyBookings() {
+    wx.navigateTo({ url: '/packageMember/my-bookings/my-bookings' });
+  },
+
   goInvoices() {
     wx.navigateTo({ url: '/packageMember/invoices/invoices' });
   },

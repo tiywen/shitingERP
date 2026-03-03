@@ -26,7 +26,7 @@ async function main() {
     await prisma.facility.createMany({
       data: [
         { name: '停车场', type: 'static', description: '地下停车场，24小时开放。' },
-        { name: '餐厅', type: 'booking', description: '石亭餐厅，需提前预约。' },
+        { name: '餐厅', type: 'booking', description: '石亭餐厅，需提前预约。', bookingCapacity: 40 },
         { name: 'K歌房', type: 'booking', description: 'K歌房预约。' },
         { name: '洗衣房', type: 'static', description: '自助洗衣房，位于B1层。' },
         { name: '匹克球场', type: 'booking', description: '匹克球场预约。' },
@@ -34,7 +34,11 @@ async function main() {
     });
     console.log('✓ 设施数据已初始化');
   } else {
-    console.log(' 设施数据已存在，跳过');
+    const restaurant = await prisma.facility.findFirst({ where: { name: '餐厅' } });
+    if (restaurant && restaurant.bookingCapacity == null) {
+      await prisma.facility.update({ where: { id: restaurant.id }, data: { bookingCapacity: 40 } });
+      console.log('✓ 餐厅预约人数上限已设为 40');
+    }
   }
 }
 

@@ -3,10 +3,12 @@ import TablePage from './pages/TablePage';
 import OrdersPage from './pages/OrdersPage';
 import WorkOrdersPage from './pages/WorkOrdersPage';
 import RoomTypePage from './pages/RoomTypePage';
+import RestaurantBookingsPage from './pages/RestaurantBookingsPage';
 
 const TABS = [
   { path: '/orders', label: '订单', realtime: true },
   { path: '/work-orders', label: '工单', realtime: true },
+  { path: '/restaurant-bookings', label: '餐厅预约' },
   { path: '/order', label: '订单表', model: 'order' },
   { path: '/user', label: '用户', model: 'user' },
   { path: '/roomType', label: '房型', page: 'roomType' },
@@ -55,6 +57,7 @@ function App() {
             <Route path="/" element={<Navigate to="/orders" replace />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/work-orders" element={<WorkOrdersPage />} />
+            <Route path="/restaurant-bookings" element={<RestaurantBookingsPage />} />
             {TABS.filter((t) => t.model).map((t) => (
               <Route
                 key={t.path}

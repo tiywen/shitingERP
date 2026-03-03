@@ -151,6 +151,7 @@ model Facility {
   name        String  // 停车场、餐厅、K歌房、洗衣房、匹克球场
   type        String  // static | booking
   description String? @db.Text // 静态介绍内容
+  bookingCapacity Int? @map("booking_capacity") // 餐厅预约每餐人数上限，仅餐厅使用，默认 40
 
   bookings FacilityBooking[]
 }
@@ -164,7 +165,13 @@ model FacilityBooking {
   user       User     @relation(fields: [userId], references: [id])
 
   bookingDate DateTime @db.Date
-  timeSlot    String   // 时间段
+  timeSlot    String   // 时间段，如 "08:00"
+
+  // 餐厅预约专用：餐次、预约类型、人数
+  mealPeriod  String?  @map("meal_period")  // breakfast | lunch | dinner
+  bookingType String?  @map("booking_type")  // table | individual 桌餐 | 单人餐
+  headcount   Int?     @map("headcount")     // 人数（桌餐≥10，单人餐≥1）
+  remark      String?  @db.Text              // 备注
 
   status     String   @default("pending") // pending | confirmed | cancelled
 

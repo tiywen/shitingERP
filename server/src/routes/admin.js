@@ -238,6 +238,83 @@ function toJson(obj) {
   return o;
 }
 
+/** GET /api/admin/restaurant-bookings - 仅餐厅预约列表（含用户、设施） */
+router.get('/restaurant-bookings', async (req, res) => {
+  try {
+    const facility = await prisma.facility.findFirst({ where: { name: '餐厅' } });
+    if (!facility) return res.json({ list: [] });
+
+    const list = await prisma.facilityBooking.findMany({
+      where: { facilityId: facility.id },
+      include: { facility: true, user: true },
+      orderBy: [{ bookingDate: 'desc' }, { timeSlot: 'asc' }],
+    });
+    const mealLabels = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+    const typeLabels = { table: '桌餐', individual: '单人餐' };
+    const statusLabels = { pending: '已提交', confirmed: '已确认', cancelled: '已取消' };
+    const out = list.map((b) => {
+      const u = b.user;
+      return {
+        id: b.id,
+        userId: b.userId,
+        userName: u ? (u.nickname || u.name || u.phone || `用户${b.userId}`) : `用户${b.userId}`,
+        userPhone: u ? u.phone : '',
+        facilityName: b.facility ? b.facility.name : '',
+        bookingDate: b.bookingDate instanceof Date ? b.bookingDate.toISOString().slice(0, 10) : b.bookingDate,
+        timeSlot: b.timeSlot,
+        mealPeriod: b.mealPeriod,
+        mealLabel: mealLabels[b.mealPeriod] || b.mealPeriod || '-',
+        bookingType: b.bookingType,
+        bookingTypeLabel: typeLabels[b.bookingType] || b.bookingType || '-',
+        headcount: b.headcount,
+        remark: b.remark,
+        status: b.status,
+        statusLabel: statusLabels[b.status] || b.status,
+        createdAt: b.createdAt instanceof Date ? b.createdAt.toISOString() : b.createdAt,
+      };
+    });
+    res.json({ list: out });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
+/** GET /api/admin/restaurant-settings - 餐厅预约设置（每餐人数上限） */
+router.get('/restaurant-settings', async (req, res) => {
+  try {
+    const facility = await prisma.facility.findFirst({ where: { name: '餐厅' } });
+    const capacityPerMeal = facility && facility.bookingCapacity != null ? facility.bookingCapacity : 40;
+    res.json({ capacityPerMeal });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
+/** PUT /api/admin/restaurant-settings - 更新餐厅预约每餐人数上限 */
+router.put('/restaurant-settings', async (req, res) => {
+  try {
+    const { capacityPerMeal } = req.body;
+    const num = capacityPerMeal != null ? parseInt(capacityPerMeal, 10) : null;
+    if (num == null || isNaN(num) || num < 1 || num > 999) {
+      return res.status(400).json({ message: '人数上限须为 1～999 的整数' });
+    }
+    const facility = await prisma.facility.findFirst({ where: { name: '餐厅' } });
+    if (!facility) {
+      return res.status(404).json({ message: '未找到餐厅设施' });
+    }
+    await prisma.facility.update({
+      where: { id: facility.id },
+      data: { bookingCapacity: num },
+    });
+    res.json({ capacityPerMeal: num });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
 /** GET /api/admin/:model - 列表 */
 router.get('/:model', async (req, res) => {
   try {

@@ -56,6 +56,10 @@ Page({
   /** 石亭设施 */
   goFacility(e) {
     const { id, type } = e.currentTarget.dataset;
+    if (id === 'restaurant') {
+      wx.navigateTo({ url: '/packageService/restaurant/restaurant' });
+      return;
+    }
     if (type === 'static') {
       wx.navigateTo({ url: `/packageService/facility-detail/facility-detail?id=${id}` });
     } else {

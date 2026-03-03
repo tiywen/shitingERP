@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="tip">每日可预约第二日、第三日、第四日的早餐、午餐、晚餐</view>
+  <view class="cards">
+    <view class="card card-click" bindtap="goTable" data-type="table">
+      <view class="card-title">桌餐预约</view>
+      <view class="card-desc">10 人起订，可选预订时间</view>
+      <text class="arrow">›</text>
+    </view>
+    <view class="card card-click" bindtap="goIndividual" data-type="individual">
+      <view class="card-title">单人餐预约</view>
+      <view class="card-desc">可选人数与预订时间</view>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+  <view class="link-wrap">
+    <navigator url="/packageService/restaurant-bookings/restaurant-bookings" class="link">我的餐厅预约</navigator>
+  </view>
+</view>

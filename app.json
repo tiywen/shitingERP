@@ -32,7 +32,10 @@
         "checkin-tutorial/checkin-tutorial",
         "work-order/work-order",
         "facility-detail/facility-detail",
-        "facility-booking/facility-booking"
+        "facility-booking/facility-booking",
+        "restaurant/restaurant",
+        "restaurant-book/restaurant-book",
+        "restaurant-bookings/restaurant-bookings"
       ]
     },
     {
@@ -41,7 +44,8 @@
       "pages": [
         "work-orders/work-orders",
         "orders/orders",
-        "invoices/invoices"
+        "invoices/invoices",
+        "my-bookings/my-bookings"
       ]
     }
   ],

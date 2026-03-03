@@ -81,7 +81,7 @@ Page({
       minCheckoutDate: tomorrow,
     });
     this._updateDateDisplay();
-    this._refreshNightsAndRooms();
+    this._refreshNightsAndRooms(today, tomorrow);
   },
 
   _updateDateDisplay() {
@@ -105,7 +105,7 @@ Page({
       minCheckoutDate: minCheckout,
     });
     this._updateDateDisplay();
-    this._refreshNightsAndRooms();
+    this._refreshNightsAndRooms(checkin, checkout);
   },
 
   onCheckoutChange(e) {
@@ -115,24 +115,25 @@ Page({
     if (this._calcNights(checkin, checkout) <= 0) validCheckout = this._addDays(checkin, 1);
     this.setData({ checkoutDate: validCheckout });
     this._updateDateDisplay();
-    this._refreshNightsAndRooms();
+    this._refreshNightsAndRooms(checkin, validCheckout);
   },
 
-  _refreshNightsAndRooms() {
-    const { checkinDate, checkoutDate } = this.data;
-    const nights = this._calcNights(checkinDate, checkoutDate);
+  _refreshNightsAndRooms(checkin, checkout) {
+    const c1 = checkin != null ? checkin : this.data.checkinDate;
+    const c2 = checkout != null ? checkout : this.data.checkoutDate;
+    const nights = this._calcNights(c1, c2);
     this.setData({ nights });
-    this.loadRoomTypes(checkinDate, checkoutDate);
+    if (c1 && c2) this.loadRoomTypes(c1, c2);
   },
 
   loadRoomTypes(checkin, checkout) {
     const { request } = require('../../utils/request');
     const hasDiscount = app.hasDiscount();
     wx.showLoading({ title: '加载中' });
+    const query = `checkin=${encodeURIComponent(checkin)}&checkout=${encodeURIComponent(checkout)}&hasDiscount=${hasDiscount ? 'true' : 'false'}`;
     request({
-      url: '/room-types',
+      url: `/room-types?${query}`,
       method: 'GET',
-      data: { checkin, checkout, hasDiscount: hasDiscount ? 'true' : 'false' },
     })
       .then((res) => {
         wx.hideLoading();

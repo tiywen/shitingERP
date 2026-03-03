@@ -11,6 +11,34 @@ export async function fetchList(model) {
   return data.list;
 }
 
+/** 餐厅预约列表（仅餐厅，含用户与状态中文） */
+export async function fetchRestaurantBookings() {
+  const res = await fetch(`${BASE}/restaurant-bookings`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '请求失败');
+  return data.list || [];
+}
+
+/** 餐厅预约设置（每餐人数上限） */
+export async function fetchRestaurantSettings() {
+  const res = await fetch(`${BASE}/restaurant-settings`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '请求失败');
+  return data;
+}
+
+/** 更新餐厅预约每餐人数上限 */
+export async function updateRestaurantSettings(body) {
+  const res = await fetch(`${BASE}/restaurant-settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '更新失败');
+  return data;
+}
+
 export async function fetchOne(model, id) {
   const res = await fetch(`${BASE}/${model}/${id}`);
   const data = await res.json();

@@ -67,6 +67,10 @@
       <text>查看订单</text>
       <text class="arrow">›</text>
     </view>
+    <view class="list-item" bindtap="goMyBookings">
+      <text>我的预约</text>
+      <text class="arrow">›</text>
+    </view>
     <view class="list-item" bindtap="goInvoices">
       <text>查看发票</text>
       <text class="arrow">›</text>

@@ -14,10 +14,13 @@ const config = require('../config/index');
  */
 function request(options) {
   return new Promise((resolve, reject) => {
+    const method = (options.method || 'GET').toUpperCase();
+    const data = options.data;
+    const sendData = method === 'GET' ? (data && Object.keys(data).length > 0 ? data : undefined) : (data || {});
     wx.request({
       url: config.baseUrl + options.url,
-      method: options.method || 'GET',
-      data: options.data || {},
+      method: method,
+      data: sendData !== undefined ? sendData : {},
       header: {
         'content-type': 'application/json',
         ...options.header,

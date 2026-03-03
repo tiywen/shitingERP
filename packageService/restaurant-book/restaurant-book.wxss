@@ -1,0 +1,100 @@
+.container {
+  padding: 32rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-secondary, #666);
+  margin-bottom: 16rpx;
+}
+
+.readonly {
+  font-size: 28rpx;
+  color: var(--text-color, #333);
+  padding: 20rpx 0;
+}
+
+.picker-value {
+  padding: 24rpx;
+  font-size: 28rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  color: var(--text-color, #333);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+  display: block;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.stepper-btn {
+  width: 72rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0;
+  font-size: 36rpx;
+  background: #f0f0f0;
+  border-radius: 12rpx;
+  color: var(--text-color, #333);
+}
+
+.stepper-btn[disabled] {
+  color: #ccc;
+  background: #f5f5f5;
+}
+
+.stepper-num {
+  font-size: 32rpx;
+  min-width: 80rpx;
+  text-align: center;
+}
+
+.tip-full {
+  margin: 24rpx 0;
+  padding: 24rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: #d48806;
+  background: #fff7e6;
+  border-radius: 12rpx;
+}
+
+.btn-submit {
+  margin-top: 48rpx;
+  background: var(--primary-color, #1a5f4a);
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 12rpx;
+}
+
+.btn-submit[disabled] {
+  background: #ccc;
+  color: #fff;
+}

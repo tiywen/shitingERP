@@ -1,0 +1,76 @@
+.container {
+  padding: 32rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.loading-wrap,
+.empty-wrap {
+  padding: 80rpx 0;
+  text-align: center;
+  color: var(--text-secondary, #666);
+}
+
+.empty-tip {
+  font-size: 28rpx;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.card .row:last-of-type {
+  margin-bottom: 0;
+}
+
+.card .row.label {
+  font-size: 26rpx;
+  color: var(--text-secondary, #666);
+  justify-content: flex-start;
+}
+
+.card .date {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #d48806;
+}
+
+.status-confirmed {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.remark {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 12rpx;
+}
