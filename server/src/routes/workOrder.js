@@ -3,10 +3,9 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../lib/prisma');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const TYPE_NAMES = {
   heating: '开关地暖',

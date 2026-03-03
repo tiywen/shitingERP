@@ -4,10 +4,9 @@
  */
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../lib/prisma');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const APP_ID = process.env.WECHAT_APPID;
 const APP_SECRET = process.env.WECHAT_SECRET;

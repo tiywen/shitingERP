@@ -5,7 +5,6 @@
  */
 
 const storage = require('./utils/storage');
-const config = require('./config/index');
 
 App({
   globalData: {

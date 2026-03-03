@@ -1,3 +1,7 @@
+/**
+ * 后台管理 - 与后端 /api/admin 的请求封装
+ * 通过 Vite 代理转发到 VITE_API_TARGET（见 admin/.env）
+ */
 const BASE = '/api/admin';
 
 export async function fetchList(model) {

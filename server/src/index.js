@@ -31,6 +31,7 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: '石亭 ERP API' });
 });
 
+// 部署到服务器时建议 listen(PORT, '0.0.0.0') 以接受外网访问
 app.listen(PORT, () => {
   console.log(`石亭 ERP 后端已启动: http://localhost:${PORT}`);
 });

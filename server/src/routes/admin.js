@@ -6,10 +6,9 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const multer = require('multer');
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../lib/prisma');
 
 const router = express.Router({ mergeParams: true });
-const prisma = new PrismaClient();
 
 const UPLOADS_DIR = path.join(__dirname, '../../uploads');
 const ROOM_TYPE_IMAGES_MAX = 10;
@@ -46,6 +45,7 @@ const DATE_FIELDS = {
   invoice: ['createdAt', 'updatedAt'],
 };
 
+/** 从字符串/数字解析为数字，无效返回 null */
 function parseNum(v) {
   if (v == null || v === '') return null;
   const n = Number(String(v).replace(/[^\d.-]/g, ''));
@@ -224,6 +224,7 @@ router.delete('/roomType/:id/images/:imageId', async (req, res) => {
   }
 });
 
+/** 将 Prisma 结果转为可 JSON 序列化的对象（Date/Decimal/关联等） */
 function toJson(obj) {
   if (!obj) return null;
   const o = { ...obj };
