@@ -35,7 +35,8 @@
         "facility-booking/facility-booking",
         "restaurant/restaurant",
         "restaurant-book/restaurant-book",
-        "restaurant-bookings/restaurant-bookings"
+        "restaurant-bookings/restaurant-bookings",
+        "facility-slot-booking/facility-slot-booking"
       ]
     },
     {

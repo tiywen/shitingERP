@@ -60,6 +60,10 @@ Page({
       wx.navigateTo({ url: '/packageService/restaurant/restaurant' });
       return;
     }
+    if (id === 'ktv' || id === 'pickleball') {
+      wx.navigateTo({ url: `/packageService/facility-slot-booking/facility-slot-booking?facility=${id}` });
+      return;
+    }
     if (type === 'static') {
       wx.navigateTo({ url: `/packageService/facility-detail/facility-detail?id=${id}` });
     } else {

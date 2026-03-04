@@ -39,6 +39,22 @@ export async function updateRestaurantSettings(body) {
   return data;
 }
 
+/** K歌房预约列表 */
+export async function fetchKtvBookings() {
+  const res = await fetch(`${BASE}/ktv-bookings`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '请求失败');
+  return data.list || [];
+}
+
+/** 匹克球场预约列表 */
+export async function fetchPickleballBookings() {
+  const res = await fetch(`${BASE}/pickleball-bookings`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '请求失败');
+  return data.list || [];
+}
+
 export async function fetchOne(model, id) {
   const res = await fetch(`${BASE}/${model}/${id}`);
   const data = await res.json();

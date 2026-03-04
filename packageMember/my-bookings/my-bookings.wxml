@@ -23,6 +23,9 @@
         {{item.mealLabel}} · {{item.bookingTypeLabel}} · {{item.headcount}}人
       </view>
       <view wx:if="{{item.remark}}" class="remark">{{item.remark}}</view>
+      <view wx:if="{{item.canCancel}}" class="row actions">
+        <button class="btn-cancel" data-id="{{item.id}}" bindtap="onCancel">取消预约</button>
+      </view>
     </view>
   </view>
 </view>

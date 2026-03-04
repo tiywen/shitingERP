@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="tip">开放时间 9:00-21:00，每时段 1 小时，最多可选 3 个时段</view>
+
+  <view wx:if="{{loading}}" class="loading-wrap">加载中...</view>
+  <view wx:elif="{{error}}" class="error-wrap">{{error}}</view>
+  <view wx:else class="grid-wrap">
+    <view wx:for="{{dates}}" wx:key="date" class="day-card">
+      <view class="day-title">{{item.label}} {{item.date}}</view>
+      <view class="slots">
+        <view
+          wx:for="{{item.slots}}"
+          wx:for-item="slot"
+          wx:key="timeSlot"
+          class="slot-cell {{slot.available ? '' : 'disabled'}} {{slot.selected ? 'selected' : ''}}"
+          data-date="{{item.date}}"
+          data-slot="{{slot}}"
+          bindtap="onSlotTap"
+        >
+          <text class="slot-label">{{slot.label}}</text>
+          <text wx:if="{{!slot.available}}" class="slot-tag">已约</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{selected.length > 0}}" class="summary">
+    已选 {{selected.length}}/3：<text wx:for="{{selected}}" wx:key="key" class="summary-item">{{item.date}} {{item.timeSlot}}</text>
+  </view>
+
+  <button
+    class="btn-submit"
+    disabled="{{selected.length === 0 || submitting}}"
+    loading="{{submitting}}"
+    bindtap="submit"
+  >
+    提交预约
+  </button>
+</view>

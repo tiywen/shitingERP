@@ -315,6 +315,70 @@ router.put('/restaurant-settings', async (req, res) => {
   }
 });
 
+/** GET /api/admin/ktv-bookings - K歌房预约列表（谁约了哪个时段，状态：已预约/已取消） */
+router.get('/ktv-bookings', async (req, res) => {
+  try {
+    const facility = await prisma.facility.findFirst({ where: { name: 'K歌房' } });
+    if (!facility) return res.json({ list: [] });
+    const list = await prisma.facilityBooking.findMany({
+      where: { facilityId: facility.id },
+      include: { facility: true, user: true },
+      orderBy: [{ bookingDate: 'desc' }, { timeSlot: 'asc' }],
+    });
+    const statusLabels = { confirmed: '已预约', cancelled: '已取消' };
+    const out = list.map((b) => {
+      const u = b.user;
+      return {
+        id: b.id,
+        userId: b.userId,
+        userName: u ? (u.nickname || u.name || u.phone || `用户${b.userId}`) : `用户${b.userId}`,
+        userPhone: u ? u.phone : '',
+        bookingDate: b.bookingDate instanceof Date ? b.bookingDate.toISOString().slice(0, 10) : b.bookingDate,
+        timeSlot: b.timeSlot,
+        status: b.status,
+        statusLabel: statusLabels[b.status] || b.status,
+        createdAt: b.createdAt instanceof Date ? b.createdAt.toISOString() : b.createdAt,
+      };
+    });
+    res.json({ list: out });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
+/** GET /api/admin/pickleball-bookings - 匹克球场预约列表 */
+router.get('/pickleball-bookings', async (req, res) => {
+  try {
+    const facility = await prisma.facility.findFirst({ where: { name: '匹克球场' } });
+    if (!facility) return res.json({ list: [] });
+    const list = await prisma.facilityBooking.findMany({
+      where: { facilityId: facility.id },
+      include: { facility: true, user: true },
+      orderBy: [{ bookingDate: 'desc' }, { timeSlot: 'asc' }],
+    });
+    const statusLabels = { confirmed: '已预约', cancelled: '已取消' };
+    const out = list.map((b) => {
+      const u = b.user;
+      return {
+        id: b.id,
+        userId: b.userId,
+        userName: u ? (u.nickname || u.name || u.phone || `用户${b.userId}`) : `用户${b.userId}`,
+        userPhone: u ? u.phone : '',
+        bookingDate: b.bookingDate instanceof Date ? b.bookingDate.toISOString().slice(0, 10) : b.bookingDate,
+        timeSlot: b.timeSlot,
+        status: b.status,
+        statusLabel: statusLabels[b.status] || b.status,
+        createdAt: b.createdAt instanceof Date ? b.createdAt.toISOString() : b.createdAt,
+      };
+    });
+    res.json({ list: out });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
 /** GET /api/admin/:model - 列表 */
 router.get('/:model', async (req, res) => {
   try {

@@ -4,11 +4,15 @@ import OrdersPage from './pages/OrdersPage';
 import WorkOrdersPage from './pages/WorkOrdersPage';
 import RoomTypePage from './pages/RoomTypePage';
 import RestaurantBookingsPage from './pages/RestaurantBookingsPage';
+import KtvBookingsPage from './pages/KtvBookingsPage';
+import PickleballBookingsPage from './pages/PickleballBookingsPage';
 
 const TABS = [
   { path: '/orders', label: '订单', realtime: true },
   { path: '/work-orders', label: '工单', realtime: true },
   { path: '/restaurant-bookings', label: '餐厅预约' },
+  { path: '/ktv-bookings', label: 'K歌房预约' },
+  { path: '/pickleball-bookings', label: '球场预约' },
   { path: '/order', label: '订单表', model: 'order' },
   { path: '/user', label: '用户', model: 'user' },
   { path: '/roomType', label: '房型', page: 'roomType' },
@@ -58,6 +62,8 @@ function App() {
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/work-orders" element={<WorkOrdersPage />} />
             <Route path="/restaurant-bookings" element={<RestaurantBookingsPage />} />
+            <Route path="/ktv-bookings" element={<KtvBookingsPage />} />
+            <Route path="/pickleball-bookings" element={<PickleballBookingsPage />} />
             {TABS.filter((t) => t.model).map((t) => (
               <Route
                 key={t.path}
