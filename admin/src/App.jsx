@@ -13,14 +13,11 @@ const TABS = [
   { path: '/restaurant-bookings', label: '餐厅预约' },
   { path: '/ktv-bookings', label: 'K歌房预约' },
   { path: '/pickleball-bookings', label: '球场预约' },
-  { path: '/order', label: '订单表', model: 'order' },
   { path: '/user', label: '用户', model: 'user' },
   { path: '/roomType', label: '房型', page: 'roomType' },
-  { path: '/room', label: '房间', model: 'room' },
   { path: '/workOrder', label: '工单表', model: 'workOrder' },
   { path: '/facility', label: '设施', model: 'facility' },
   { path: '/facilityBooking', label: '设施预约', model: 'facilityBooking' },
-  { path: '/invoice', label: '发票', model: 'invoice' },
 ];
 
 function App() {
