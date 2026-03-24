@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchList, create, update, remove, bulkRemove } from '../api';
 
 const HIDDEN = ['createdAt', 'updatedAt', 'roomType', 'user', 'order', 'facility', 'owner', 'members'];
@@ -57,6 +57,21 @@ const FIELD_LABELS = {
   timeSlot: '时间段',
   orderId: '订单ID',
   amount: '金额',
+  serialNo: '序号',
+  category: '资产类别',
+  name: '资产名称',
+  specification: '规格型号',
+  quantity: '数量',
+  unit: '单位',
+  price: '价格',
+  purchaseTime: '采购时间',
+  serviceLife: '使用年限',
+  usageStatus: '使用情况',
+  productSerialNo: '产品序列号',
+  productAppearance: '产品外观',
+  storageLocation: '存放地点',
+  dailyManager: '日常管理人',
+  remark: '备注',
 };
 
 function getLabel(key) {
@@ -70,13 +85,33 @@ function formatVal(v) {
   return String(v);
 }
 
-export default function TablePage({ model, title, extraActions, hiddenCols = [], multiSelect = false, extraColumns = [] }) {
+function compare(a, b, key) {
+  let va = a[key];
+  let vb = b[key];
+  const numA = typeof va === 'number' ? va : Number(va);
+  const numB = typeof vb === 'number' ? vb : Number(vb);
+  if (!Number.isNaN(numA) && !Number.isNaN(numB)) return numA - numB;
+  const strA = va == null ? '' : String(va);
+  const strB = vb == null ? '' : String(vb);
+  const dateLike = (s) => /^\d{4}-\d{2}-\d{2}/.test(s);
+  if (dateLike(strA) && dateLike(strB)) return strA.slice(0, 10).localeCompare(strB.slice(0, 10));
+  return strA.localeCompare(strB, undefined, { numeric: true });
+}
+
+export default function TablePage({ model, title, extraActions, hiddenCols = [], multiSelect = false, extraColumns = [], filterConfig = [], createButtonLabel = '+ 新建', requiredFields = [], renderFormExtra }) {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [filterValues, setFilterValues] = useState(() => {
+    const o = {};
+    filterConfig.forEach((k) => { o[k] = ''; });
+    return o;
+  });
 
   const load = useCallback(async () => {
     try {
@@ -98,6 +133,51 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
   const cols = allCols.filter((k) => !hiddenCols.includes(k));
   const formCols = allCols.filter((k) => !hiddenCols.includes(k) && !extraColumns.some((ec) => ec.key === k));
 
+  const filterOptions = useMemo(() => {
+    const opts = {};
+    filterConfig.forEach((key) => {
+      const values = new Set();
+      list.forEach((row) => {
+        const v = row[key];
+        if (v != null && String(v).trim() !== '') values.add(String(v).trim());
+      });
+      opts[key] = [...values].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    });
+    return opts;
+  }, [list, filterConfig]);
+
+  const displayedList = useMemo(() => {
+    let result = list;
+    if (filterConfig.length > 0 && list.length > 0) {
+      result = list.filter((row) => {
+        for (const key of filterConfig) {
+          const fv = filterValues[key];
+          if (fv === '') continue;
+          const cell = row[key];
+          const cellStr = cell != null ? String(cell).trim() : '';
+          if (cellStr !== fv) return false;
+        }
+        return true;
+      });
+    }
+    if (sortBy && result.length > 0) {
+      result = [...result].sort((a, b) => {
+        const diff = compare(a, b, sortBy);
+        return sortOrder === 'asc' ? diff : -diff;
+      });
+    }
+    return result;
+  }, [list, filterConfig, filterValues, sortBy, sortOrder]);
+
+  const handleSort = (col) => {
+    if (sortBy === col) {
+      setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(col);
+      setSortOrder('asc');
+    }
+  };
+
   const openEdit = (row) => {
     setEditing(row?.id || 'new');
     const f = { ...row };
@@ -118,7 +198,13 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
   const handleSave = async () => {
     try {
       if (editing === 'new') {
-        await create(model, form);
+        const result = await create(model, form);
+        if (renderFormExtra && result && result.id != null) {
+          setEditing(result.id);
+          setForm({ ...result, id: undefined });
+          setList((prev) => [{ ...result }, ...prev]);
+          return;
+        }
       } else {
         await update(model, editing, form);
       }
@@ -149,8 +235,8 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === list.length) setSelectedIds(new Set());
-    else setSelectedIds(new Set(list.map((r) => r.id)));
+    if (selectedIds.size === displayedList.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(displayedList.map((r) => r.id)));
   };
 
   const handleBulkDelete = async () => {
@@ -182,9 +268,29 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
               批量删除 ({selectedIds.size})
             </button>
           )}
-          <button onClick={() => openEdit(null)} style={styles.btn}>+ 新建</button>
+          <button onClick={() => openEdit(null)} style={styles.btn}>{createButtonLabel}</button>
         </div>
       </div>
+
+      {filterConfig.length > 0 && (
+        <div style={styles.filterRow}>
+          {filterConfig.map((key) => (
+            <label key={key} style={styles.filterItem}>
+              <span style={styles.filterLabel}>{getLabel(key)}：</span>
+              <select
+                value={filterValues[key] ?? ''}
+                onChange={(e) => setFilterValues((prev) => ({ ...prev, [key]: e.target.value }))}
+                style={styles.filterSelect}
+              >
+                <option value="">全部</option>
+                {(filterOptions[key] || []).map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      )}
 
       <div style={styles.tableWrap}>
         <table style={styles.table}>
@@ -192,11 +298,19 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
             <tr>
               {multiSelect && (
                 <th style={{ ...styles.th, width: 48 }}>
-                  <input type="checkbox" checked={list.length > 0 && selectedIds.size === list.length} onChange={toggleSelectAll} />
+                  <input type="checkbox" checked={displayedList.length > 0 && selectedIds.size === displayedList.length} onChange={toggleSelectAll} />
                 </th>
               )}
               {cols.map((c) => (
-                <th key={c} style={styles.th}>{getLabel(c)}</th>
+                <th
+                  key={c}
+                  style={{ ...styles.th, ...styles.thSort }}
+                  onClick={() => handleSort(c)}
+                  title="点击按该列排序"
+                >
+                  {getLabel(c)}
+                  {sortBy === c && <span style={styles.sortIcon}>{sortOrder === 'asc' ? ' ↑' : ' ↓'}</span>}
+                </th>
               ))}
               {extraColumns.map((ec) => (
                 <th key={ec.key} style={styles.th}>{ec.label}</th>
@@ -205,7 +319,7 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
             </tr>
           </thead>
           <tbody>
-            {list.map((row) => (
+            {displayedList.map((row) => (
               <tr key={row.id}>
                 {multiSelect && (
                   <td style={styles.td}>
@@ -235,7 +349,10 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
             <div style={styles.form}>
               {formCols.filter((c) => c !== 'id').map((k) => (
                 <div key={k} style={styles.field}>
-                  <label>{getLabel(k)}</label>
+                  <label>
+                    {getLabel(k)}
+                    {requiredFields.includes(k) && <span style={{ color: '#f5222d', marginLeft: 4 }}>*</span>}
+                  </label>
                   <input
                     value={form[k] ?? ''}
                     onChange={(e) => setForm({ ...form, [k]: e.target.value })}
@@ -244,6 +361,13 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
                 </div>
               ))}
             </div>
+            {renderFormExtra && renderFormExtra({
+              isNew: editing === 'new',
+              editingId: editing === 'new' ? null : editing,
+              form,
+              closeEdit,
+              load,
+            })}
             <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
               <button onClick={handleSave} style={styles.btn}>保存</button>
               <button onClick={closeEdit} style={{ ...styles.btn, background: '#999' }}>取消</button>
@@ -259,6 +383,8 @@ const styles = {
   tableWrap: { background: '#fff', borderRadius: 8, overflow: 'auto', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 600 },
   th: { padding: '12px 16px', textAlign: 'left', background: '#fafafa', borderBottom: '1px solid #eee', fontWeight: 500 },
+  thSort: { cursor: 'pointer', userSelect: 'none' },
+  sortIcon: { marginLeft: 4, color: '#1a5f4a', fontSize: 12 },
   td: { padding: '12px 16px', borderBottom: '1px solid #eee' },
   btn: { padding: '8px 16px', background: '#1a5f4a', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' },
   btnSm: { padding: '4px 10px', fontSize: 12, background: 'transparent', border: '1px solid #ddd', borderRadius: 4, cursor: 'pointer' },
@@ -267,4 +393,18 @@ const styles = {
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   field: { display: 'flex', flexDirection: 'column', gap: 4 },
   input: { padding: 8, border: '1px solid #ddd', borderRadius: 4 },
+  filterRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 16,
+    alignItems: 'center',
+    marginBottom: 12,
+    padding: '12px 16px',
+    background: '#fafafa',
+    borderRadius: 8,
+    border: '1px solid #eee',
+  },
+  filterItem: { display: 'flex', alignItems: 'center', gap: 6 },
+  filterLabel: { fontSize: 14, color: '#333' },
+  filterSelect: { padding: '6px 10px', borderRadius: 4, border: '1px solid #ddd', minWidth: 120 },
 };

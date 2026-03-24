@@ -23,6 +23,7 @@ const MODELS = {
   facility: prisma.facility,
   facilityBooking: prisma.facilityBooking,
   invoice: prisma.invoice,
+  fixedAsset: prisma.fixedAsset,
 };
 
 const INCLUDES = {
@@ -43,6 +44,7 @@ const DATE_FIELDS = {
   facility: [],
   facilityBooking: ['bookingDate', 'createdAt', 'updatedAt'],
   invoice: ['createdAt', 'updatedAt'],
+  fixedAsset: ['purchaseTime', 'createdAt', 'updatedAt'],
 };
 
 /** 从字符串/数字解析为数字，无效返回 null */
@@ -52,6 +54,148 @@ function parseNum(v) {
   return isNaN(n) ? null : n;
 }
 
+/** 固定资产 Excel 规定表头（顺序可任意，但必须全部存在） */
+const FIXED_ASSET_HEADERS = ['序号', '资产类别', '资产名称', '规格型号', '数量', '单位', '价格', '采购时间', '使用年限', '使用情况', '产品序列号', '产品外观', '存放地点', '日常管理人', '备注'];
+/** 导入时可空的三项，其余均为必填 */
+const FIXED_ASSET_OPTIONAL = ['产品序列号', '产品外观', '备注', '规格型号'];
+const FIXED_ASSET_REQUIRED = FIXED_ASSET_HEADERS.filter((h) => !FIXED_ASSET_OPTIONAL.includes(h));
+
+function normHeader(s) {
+  return String(s ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function isEmpty(v) {
+  return v == null || String(v).trim() === '';
+}
+
+function parseDate(v) {
+  if (v == null || v === '') return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/** POST /api/admin/fixedAsset/import - 固定资产 Excel 导入（表头与格式校验） */
+router.post('/fixedAsset/import', async (req, res) => {
+  try {
+    const { rows } = req.body;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ message: '请上传有效的 Excel 数据' });
+    }
+    const norm = normHeader;
+    const firstRow = rows[0] || {};
+    const headers = Object.keys(firstRow).map(norm).filter(Boolean);
+    const required = FIXED_ASSET_HEADERS.map(norm);
+    const missing = required.filter((h) => !headers.includes(h));
+    if (missing.length) {
+      return res.status(400).json({ message: `表头与规定不一致，缺少：${missing.join('、')}` });
+    }
+    const keyMap = {};
+    Object.keys(firstRow).forEach((k) => {
+      keyMap[norm(k)] = k;
+    });
+    const get = (row, label) => row[keyMap[norm(label)]];
+    const serialNos = rows.map((r) => parseNum(get(r, '序号'))).filter((n) => n != null);
+    const seen = new Set();
+    const duplicates = [];
+    for (const no of serialNos) {
+      if (seen.has(no)) {
+        if (!duplicates.includes(no)) duplicates.push(no);
+      } else {
+        seen.add(no);
+      }
+    }
+    if (duplicates.length > 0) {
+      return res.status(400).json({ message: `导入失败：存在重复序号，请检查后重试。重复序号：${duplicates.join('、')}` });
+    }
+    let created = 0;
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      for (const label of FIXED_ASSET_REQUIRED) {
+        const val = get(row, label);
+        if (isEmpty(val)) {
+          return res.status(400).json({ message: `第 ${i + 1} 行「${label}」为必填项，不能为空` });
+        }
+      }
+      const quantity = parseNum(get(row, '数量'));
+      const price = parseNum(get(row, '价格'));
+      const purchaseTime = parseDate(get(row, '采购时间'));
+      const serialNo = parseNum(get(row, '序号'));
+      if (quantity === null || quantity < 0) {
+        return res.status(400).json({ message: `第 ${i + 1} 行「数量」格式应为有效数字` });
+      }
+      if (price === null) {
+        return res.status(400).json({ message: `第 ${i + 1} 行「价格」格式应为有效数字` });
+      }
+      if (!purchaseTime) {
+        return res.status(400).json({ message: `第 ${i + 1} 行「采购时间」格式应为有效日期` });
+      }
+      if (serialNo === null) {
+        return res.status(400).json({ message: `第 ${i + 1} 行「序号」格式应为数字` });
+      }
+      const data = {
+        serialNo,
+        category: get(row, '资产类别') ?? undefined,
+        name: get(row, '资产名称') ?? undefined,
+        specification: get(row, '规格型号') ?? undefined,
+        quantity,
+        unit: get(row, '单位') ?? undefined,
+        price,
+        purchaseTime,
+        serviceLife: get(row, '使用年限') ?? undefined,
+        usageStatus: get(row, '使用情况') ?? undefined,
+        productSerialNo: get(row, '产品序列号') ?? undefined,
+        productAppearance: get(row, '产品外观') ?? undefined,
+        storageLocation: get(row, '存放地点') ?? undefined,
+        dailyManager: get(row, '日常管理人') ?? undefined,
+        remark: get(row, '备注') ?? undefined,
+      };
+      const clean = {};
+      Object.keys(data).forEach((k) => {
+        let v = data[k];
+        if (v === undefined || v === '') return;
+        if (typeof v === 'object' && v !== null && !(v instanceof Date)) {
+          v = v.value != null ? v.value : (typeof v.toString === 'function' ? v.toString() : String(v));
+          if (v === '[object Object]' || (typeof v === 'string' && !v.trim())) return;
+          v = typeof v === 'string' ? v.trim() : v;
+        }
+        if (k === 'purchaseTime') {
+          if (!(v instanceof Date)) {
+            const raw = (v && typeof v === 'object' && v.value != null) ? v.value : v;
+            v = parseDate(raw) || null;
+          }
+          if (!v || !(v instanceof Date)) return;
+        }
+        if (['serialNo', 'quantity'].includes(k)) v = parseInt(v, 10);
+        if (k === 'price') v = Number(v);
+        if (['category', 'name', 'specification', 'unit', 'serviceLife', 'usageStatus', 'productSerialNo', 'productAppearance', 'storageLocation', 'dailyManager', 'remark'].includes(k)) {
+          v = String(v).trim() || undefined;
+          if (v === undefined) return;
+        }
+        clean[k] = v;
+      });
+      // 确保日期字段为原生 Date，避免收到 { $type: "DateTime", value } 等对象
+      if (clean.purchaseTime != null && typeof clean.purchaseTime === 'object' && !(clean.purchaseTime instanceof Date)) {
+        const raw = clean.purchaseTime.value ?? clean.purchaseTime;
+        const d = parseDate(raw);
+        if (d) clean.purchaseTime = d;
+        else return res.status(400).json({ message: `第 ${i + 1} 行「采购时间」无法解析为有效日期` });
+      }
+      try {
+        await prisma.fixedAsset.create({ data: clean });
+        created++;
+      } catch (err) {
+        console.error('固定资产导入失败 第', i + 1, '行:', row);
+        return res.status(400).json({ message: `第 ${i + 1} 行导入失败: ${err.message}` });
+      }
+    }
+    res.json({ success: true, created, message: `成功导入 ${created} 条` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '导入失败' });
+  }
+});
 
 /** POST /api/admin/roomType/import - Excel 批量导入 */
 router.post('/roomType/import', async (req, res) => {
@@ -224,6 +368,98 @@ router.delete('/roomType/:id/images/:imageId', async (req, res) => {
   }
 });
 
+const FIXED_ASSET_IMAGES_MAX = 10;
+const fixedAssetImagesStorage = multer.diskStorage({
+  destination(req, file, cb) {
+    const id = req.params.id;
+    const dir = path.join(UPLOADS_DIR, 'fixed-assets', String(id));
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename(req, file, cb) {
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, `${Date.now()}${ext}`);
+  },
+});
+const uploadFixedAssetImage = multer({
+  storage: fixedAssetImagesStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter(req, file, cb) {
+    if (ALLOWED_MIMES.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('仅支持 PNG/JPG 图片'));
+  },
+}).single('image');
+
+/** GET /api/admin/fixedAsset/:id/images - 固定资产产品外观图列表 */
+router.get('/fixedAsset/:id/images', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const images = await prisma.fixedAssetImage.findMany({
+      where: { fixedAssetId: id },
+      orderBy: { sortOrder: 'asc' },
+    });
+    const baseUrl = (req.protocol && req.get('host')) ? `${req.protocol}://${req.get('host')}` : '';
+    const list = images.map((img) => ({
+      id: img.id,
+      path: img.path,
+      url: `${baseUrl}/uploads/${img.path}`,
+      sortOrder: img.sortOrder,
+    }));
+    res.json({ list });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
+/** POST /api/admin/fixedAsset/:id/images - 上传产品外观图（最多 10 张） */
+router.post('/fixedAsset/:id/images', (req, res, next) => {
+  uploadFixedAssetImage(req, res, async (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+    try {
+      const fixedAssetId = parseInt(req.params.id, 10);
+      const count = await prisma.fixedAssetImage.count({ where: { fixedAssetId } });
+      if (count >= FIXED_ASSET_IMAGES_MAX) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(400).json({ message: `每条资产最多上传 ${FIXED_ASSET_IMAGES_MAX} 张图片` });
+      }
+      const relativePath = path.relative(UPLOADS_DIR, req.file.path).replace(/\\/g, '/');
+      const image = await prisma.fixedAssetImage.create({
+        data: { fixedAssetId, path: relativePath, sortOrder: count },
+      });
+      const baseUrl = (req.protocol && req.get('host')) ? `${req.protocol}://${req.get('host')}` : '';
+      res.json({
+        id: image.id,
+        path: image.path,
+        url: `${baseUrl}/uploads/${image.path}`,
+        sortOrder: image.sortOrder,
+      });
+    } catch (e) {
+      if (req.file && req.file.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      console.error(e);
+      res.status(500).json({ message: e.message || '上传失败' });
+    }
+  });
+});
+
+/** DELETE /api/admin/fixedAsset/:id/images/:imageId - 删除产品外观图 */
+router.delete('/fixedAsset/:id/images/:imageId', async (req, res) => {
+  try {
+    const imageId = parseInt(req.params.imageId, 10);
+    const image = await prisma.fixedAssetImage.findFirst({
+      where: { id: imageId, fixedAssetId: parseInt(req.params.id, 10) },
+    });
+    if (!image) return res.status(404).json({ message: '图片不存在' });
+    const fullPath = path.join(UPLOADS_DIR, image.path);
+    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    await prisma.fixedAssetImage.delete({ where: { id: imageId } });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || '服务器错误' });
+  }
+});
+
 /** 将 Prisma 结果转为可 JSON 序列化的对象（Date/Decimal/关联等） */
 function toJson(obj) {
   if (!obj) return null;
@@ -386,7 +622,26 @@ router.get('/:model', async (req, res) => {
     if (!model) return res.status(404).json({ message: '模型不存在' });
 
     const include = INCLUDES[req.params.model];
-    const list = await model.findMany({ include: include || undefined, orderBy: { id: 'desc' } });
+    let list = await model.findMany({ include: include || undefined, orderBy: { id: 'desc' } });
+
+    if (req.params.model === 'fixedAsset' && list.length > 0) {
+      try {
+        const ids = list.map((r) => r.id);
+        const images = await prisma.fixedAssetImage.findMany({
+          where: { fixedAssetId: { in: ids } },
+          orderBy: { sortOrder: 'asc' },
+        });
+        const byAsset = {};
+        images.forEach((img) => {
+          if (!byAsset[img.fixedAssetId]) byAsset[img.fixedAssetId] = [];
+          byAsset[img.fixedAssetId].push({ id: img.id, path: img.path, sortOrder: img.sortOrder });
+        });
+        list = list.map((row) => ({ ...row, images: byAsset[row.id] || [] }));
+      } catch (e) {
+        list = list.map((row) => ({ ...row, images: [] }));
+      }
+    }
+
     res.json({ list: list.map(toJson) });
   } catch (err) {
     console.error(err);

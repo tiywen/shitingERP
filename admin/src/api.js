@@ -95,6 +95,18 @@ export async function importRoomTypes(rows) {
   return data;
 }
 
+/** 固定资产 Excel 导入（表头须与规定一致） */
+export async function importFixedAssets(rows) {
+  const res = await fetch(`${BASE}/fixedAsset/import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rows }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '导入失败');
+  return data;
+}
+
 export async function remove(model, id) {
   const res = await fetch(`${BASE}/${model}/${id}`, { method: 'DELETE' });
   const data = await res.json();
@@ -134,6 +146,38 @@ export async function uploadRoomTypeImage(roomTypeId, file) {
 
 export async function deleteRoomTypeImage(roomTypeId, imageId) {
   const res = await fetch(`${BASE}/roomType/${roomTypeId}/images/${imageId}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '删除失败');
+  return data;
+}
+
+/** 固定资产产品外观图（复用上传根路径） */
+export function getUploadUrl(path) {
+  if (!path) return '';
+  return `${UPLOADS_BASE}/uploads/${path}`;
+}
+
+export async function getFixedAssetImages(fixedAssetId) {
+  const res = await fetch(`${BASE}/fixedAsset/${fixedAssetId}/images`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '获取失败');
+  return data.list;
+}
+
+export async function uploadFixedAssetImage(fixedAssetId, file) {
+  const form = new FormData();
+  form.append('image', file);
+  const res = await fetch(`${BASE}/fixedAsset/${fixedAssetId}/images`, {
+    method: 'POST',
+    body: form,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || '上传失败');
+  return data;
+}
+
+export async function deleteFixedAssetImage(fixedAssetId, imageId) {
+  const res = await fetch(`${BASE}/fixedAsset/${fixedAssetId}/images/${imageId}`, { method: 'DELETE' });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || '删除失败');
   return data;

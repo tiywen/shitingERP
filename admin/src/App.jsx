@@ -3,6 +3,7 @@ import TablePage from './pages/TablePage';
 import OrdersPage from './pages/OrdersPage';
 import WorkOrdersPage from './pages/WorkOrdersPage';
 import RoomTypePage from './pages/RoomTypePage';
+import FixedAssetPage from './pages/FixedAssetPage';
 import RestaurantBookingsPage from './pages/RestaurantBookingsPage';
 import KtvBookingsPage from './pages/KtvBookingsPage';
 import PickleballBookingsPage from './pages/PickleballBookingsPage';
@@ -15,6 +16,7 @@ const TABS = [
   { path: '/pickleball-bookings', label: '球场预约' },
   { path: '/user', label: '用户', model: 'user' },
   { path: '/roomType', label: '房型', page: 'roomType' },
+  { path: '/fixedAsset', label: '固定资产', page: 'fixedAsset' },
   { path: '/workOrder', label: '工单表', model: 'workOrder' },
   { path: '/facility', label: '设施', model: 'facility' },
   { path: '/facilityBooking', label: '设施预约', model: 'facilityBooking' },
@@ -69,6 +71,7 @@ function App() {
               />
             ))}
             <Route path="/roomType" element={<RoomTypePage />} />
+            <Route path="/fixedAsset" element={<FixedAssetPage />} />
           </Routes>
         </main>
       </div>

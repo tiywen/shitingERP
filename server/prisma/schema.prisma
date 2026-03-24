@@ -193,3 +193,42 @@ model Invoice {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ============ 固定资产 ============
+model FixedAsset {
+  id               Int       @id @default(autoincrement())
+  serialNo         Int?      @map("serial_no")         // 序号
+  category         String?   @map("category")          // 资产类别
+  name             String?   @map("name")               // 资产名称
+  specification    String?   @map("specification")     // 规格型号
+  quantity         Int?      @map("quantity")          // 数量
+  unit             String?   @map("unit")              // 单位
+  price            Decimal?  @db.Decimal(12, 2) @map("price") // 价格
+  purchaseTime     DateTime? @db.Date @map("purchase_time")    // 采购时间
+  serviceLife      String?   @map("service_life")      // 使用年限
+  usageStatus      String?   @map("usage_status")     // 使用情况
+  productSerialNo  String?   @map("product_serial_no") // 产品序列号
+  productAppearance String?  @db.Text @map("product_appearance") // 产品外观（预留，实际用 images）
+  storageLocation  String?   @map("storage_location") // 存放地点
+  dailyManager     String?   @map("daily_manager")    // 日常管理人
+  remark           String?   @db.Text @map("remark")  // 备注
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  images    FixedAssetImage[]
+
+  @@map("fixed_assets")
+}
+
+// ============ 固定资产产品外观图 ============
+model FixedAssetImage {
+  id           Int        @id @default(autoincrement())
+  fixedAssetId Int        @map("fixed_asset_id")
+  fixedAsset   FixedAsset @relation(fields: [fixedAssetId], references: [id], onDelete: Cascade)
+  path         String     // 存储路径，如 fixed-assets/1/xxx.jpg
+  sortOrder    Int        @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now())
+
+  @@map("fixed_asset_images")
+}
