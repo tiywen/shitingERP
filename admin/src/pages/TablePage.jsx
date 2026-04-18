@@ -59,11 +59,9 @@ const FIELD_LABELS = {
   amount: '金额',
   serialNo: '序号',
   category: '资产类别',
-  name: '资产名称',
   specification: '规格型号',
   quantity: '数量',
   unit: '单位',
-  price: '价格',
   purchaseTime: '采购时间',
   serviceLife: '使用年限',
   usageStatus: '使用情况',
@@ -71,10 +69,19 @@ const FIELD_LABELS = {
   productAppearance: '产品外观',
   storageLocation: '存放地点',
   dailyManager: '日常管理人',
+};
+
+/** 与 user/房型等共用字段名时，固定资产表头单独覆盖（避免 FIELD_LABELS 重复 key） */
+const FIXED_ASSET_LABEL_OVERRIDES = {
+  name: '资产名称',
+  price: '价格',
   remark: '备注',
 };
 
-function getLabel(key) {
+function getLabel(key, model) {
+  if (model === 'fixedAsset' && FIXED_ASSET_LABEL_OVERRIDES[key]) {
+    return FIXED_ASSET_LABEL_OVERRIDES[key];
+  }
   return FIELD_LABELS[key] ?? key;
 }
 
@@ -276,7 +283,7 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
         <div style={styles.filterRow}>
           {filterConfig.map((key) => (
             <label key={key} style={styles.filterItem}>
-              <span style={styles.filterLabel}>{getLabel(key)}：</span>
+              <span style={styles.filterLabel}>{getLabel(key, model)}：</span>
               <select
                 value={filterValues[key] ?? ''}
                 onChange={(e) => setFilterValues((prev) => ({ ...prev, [key]: e.target.value }))}
@@ -308,7 +315,7 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
                   onClick={() => handleSort(c)}
                   title="点击按该列排序"
                 >
-                  {getLabel(c)}
+                  {getLabel(c, model)}
                   {sortBy === c && <span style={styles.sortIcon}>{sortOrder === 'asc' ? ' ↑' : ' ↓'}</span>}
                 </th>
               ))}
@@ -350,7 +357,7 @@ export default function TablePage({ model, title, extraActions, hiddenCols = [],
               {formCols.filter((c) => c !== 'id').map((k) => (
                 <div key={k} style={styles.field}>
                   <label>
-                    {getLabel(k)}
+                    {getLabel(k, model)}
                     {requiredFields.includes(k) && <span style={{ color: '#f5222d', marginLeft: 4 }}>*</span>}
                   </label>
                   <input
