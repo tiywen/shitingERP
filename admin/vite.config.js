@@ -7,7 +7,19 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
+      // 监听所有网卡，ECS 上才能用公网 IP:5174 访问（安全组需放行该端口）
+      host: '0.0.0.0',
       port: 5174,
+      strictPort: true,
+      proxy: {
+        '/api': { target: apiTarget, changeOrigin: true },
+        '/uploads': { target: apiTarget, changeOrigin: true },
+      },
+    },
+    preview: {
+      host: '0.0.0.0',
+      port: 4173,
+      strictPort: true,
       proxy: {
         '/api': { target: apiTarget, changeOrigin: true },
         '/uploads': { target: apiTarget, changeOrigin: true },

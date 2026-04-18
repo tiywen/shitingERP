@@ -47,7 +47,10 @@ router.get('/slot-availability', async (req, res) => {
     }
     const facility = await getFacilityByName(facilityName);
     if (!facility) {
-      return res.json({ dates: [] });
+      return res.json({
+        dates: [],
+        hint: `数据库中未找到「${facilityName}」设施。请在服务器进入 server 目录执行：npm run db:seed`,
+      });
     }
     const dates = getNext3Days();
     const dateStrs = dates.map((d) => d.date);

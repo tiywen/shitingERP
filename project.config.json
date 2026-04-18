@@ -47,7 +47,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.4",
+  "libVersion": "3.14.2",
   "appid": "wx374b0ec964e72ca4",
   "projectname": "shitingERP",
   "condition": {},

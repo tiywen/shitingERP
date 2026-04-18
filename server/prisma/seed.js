@@ -40,6 +40,19 @@ async function main() {
       console.log('✓ 餐厅预约人数上限已设为 40');
     }
   }
+
+  // 时段预约依赖「K歌房」「匹克球场」两条设施；若库里有其它设施但缺这两条，补建
+  const slotFacilities = [
+    { name: 'K歌房', type: 'booking', description: 'K歌房预约。' },
+    { name: '匹克球场', type: 'booking', description: '匹克球场预约。' },
+  ];
+  for (const row of slotFacilities) {
+    const exists = await prisma.facility.findFirst({ where: { name: row.name } });
+    if (!exists) {
+      await prisma.facility.create({ data: row });
+      console.log(`✓ 已补充设施: ${row.name}`);
+    }
+  }
 }
 
 main()

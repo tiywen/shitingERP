@@ -16,6 +16,7 @@ Page({
     selected: [],
     loading: true,
     error: '',
+    emptyHint: '',
     submitting: false,
   },
 
@@ -30,7 +31,7 @@ Page({
   },
 
   loadAvailability() {
-    this.setData({ loading: true, error: '' });
+    this.setData({ loading: true, error: '', emptyHint: '' });
     request({
       url: `/facilities/slot-availability?facility=${encodeURIComponent(this.data.facility)}`,
       method: 'GET',
@@ -40,10 +41,14 @@ Page({
           ...d,
           slots: (d.slots || []).map((s) => ({ ...s, selected: false })),
         }));
-        this.setData({ dates, loading: false });
+        const emptyHint =
+          dates.length === 0
+            ? (res.hint || '暂无可预约时段，请稍后再试或联系管理员')
+            : '';
+        this.setData({ dates, loading: false, emptyHint });
       })
       .catch((err) => {
-        this.setData({ error: err.message || '加载失败', loading: false });
+        this.setData({ error: err.message || '加载失败', loading: false, emptyHint: '' });
       });
   },
 

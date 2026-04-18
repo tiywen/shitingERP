@@ -11,10 +11,10 @@
 module.exports = {
   /** 后端 API 基础地址（末尾不要漏 /api） */
   // 仅模拟器可用：
-  baseUrl: 'http://localhost:3000/api',
+  // baseUrl: 'http://localhost:3000/api',
   // 真机调试时请改成（示例，IP 换成你自己的）：
-  // baseUrl: 'http://192.168.1.8:3000/api',
-
+  baseUrl: 'http://8.219.79.146:3001/api',
+  
   /** 用户角色枚举 */
   USER_ROLE: {
     OWNER: 'owner',   // 业主
