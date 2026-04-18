@@ -1,12 +1,15 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import TablePage from './pages/TablePage';
 import OrdersPage from './pages/OrdersPage';
 import WorkOrdersPage from './pages/WorkOrdersPage';
 import RoomTypePage from './pages/RoomTypePage';
-import FixedAssetPage from './pages/FixedAssetPage';
-import RestaurantBookingsPage from './pages/RestaurantBookingsPage';
-import KtvBookingsPage from './pages/KtvBookingsPage';
-import PickleballBookingsPage from './pages/PickleballBookingsPage';
+
+/** 懒加载：减少 dev 模式下并发请求 xlsx/多页面，降低 ERR_CONTENT_LENGTH_MISMATCH */
+const FixedAssetPage = lazy(() => import('./pages/FixedAssetPage'));
+const RestaurantBookingsPage = lazy(() => import('./pages/RestaurantBookingsPage'));
+const KtvBookingsPage = lazy(() => import('./pages/KtvBookingsPage'));
+const PickleballBookingsPage = lazy(() => import('./pages/PickleballBookingsPage'));
 
 const TABS = [
   { path: '/orders', label: '订单', realtime: true },
@@ -56,23 +59,25 @@ function App() {
           </nav>
         </aside>
         <main style={styles.main}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/orders" replace />} />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/work-orders" element={<WorkOrdersPage />} />
-            <Route path="/restaurant-bookings" element={<RestaurantBookingsPage />} />
-            <Route path="/ktv-bookings" element={<KtvBookingsPage />} />
-            <Route path="/pickleball-bookings" element={<PickleballBookingsPage />} />
-            {TABS.filter((t) => t.model).map((t) => (
-              <Route
-                key={t.path}
-                path={t.path}
-                element={<TablePage model={t.model} title={t.label} />}
-              />
-            ))}
-            <Route path="/roomType" element={<RoomTypePage />} />
-            <Route path="/fixedAsset" element={<FixedAssetPage />} />
-          </Routes>
+          <Suspense fallback={<div style={{ padding: 24 }}>加载中…</div>}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/orders" replace />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/work-orders" element={<WorkOrdersPage />} />
+              <Route path="/restaurant-bookings" element={<RestaurantBookingsPage />} />
+              <Route path="/ktv-bookings" element={<KtvBookingsPage />} />
+              <Route path="/pickleball-bookings" element={<PickleballBookingsPage />} />
+              {TABS.filter((t) => t.model).map((t) => (
+                <Route
+                  key={t.path}
+                  path={t.path}
+                  element={<TablePage model={t.model} title={t.label} />}
+                />
+              ))}
+              <Route path="/roomType" element={<RoomTypePage />} />
+              <Route path="/fixedAsset" element={<FixedAssetPage />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </BrowserRouter>

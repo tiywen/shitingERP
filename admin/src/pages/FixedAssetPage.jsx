@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import * as XLSX from 'xlsx';
 import {
   importFixedAssets,
   getFixedAssetImages,
@@ -82,6 +81,8 @@ export default function FixedAssetPage() {
     if (!file) return;
     try {
       const buf = await file.arrayBuffer();
+      const xlsxMod = await import('xlsx');
+      const XLSX = xlsxMod.default && xlsxMod.default.read ? xlsxMod.default : xlsxMod;
       const wb = XLSX.read(buf, { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
