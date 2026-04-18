@@ -16,7 +16,8 @@ shitingERP/
 ├── utils/                 # 工具函数（request、storage）
 ├── components/            # 通用组件
 ├── pages/                 # 主包页面
-│   ├── index/             # 订房首页
+│   ├── index/             # 首页（订房 / 商城 双入口）
+│   ├── room/              # 订房列表（原首页订房能力）
 │   ├── booking/           # 预订表单
 │   ├── service/           # 服务
 │   └── member/            # 会员
@@ -26,10 +27,14 @@ shitingERP/
 │   ├── work-order/        # 工单
 │   ├── facility-detail/   # 设施介绍（静态）
 │   └── facility-booking/  # 设施预约
-└── packageMember/         # 会员分包
-    ├── work-orders/       # 工单状态
-    ├── orders/            # 订单
-    └── invoices/          # 发票
+├── packageMall/           # 商城分包（演示数据，暂未对接后端）
+│   ├── mall/              # 商品列表
+│   ├── mall-detail/       # 商品详情
+│   └── mall-order/        # 确认订单（演示提交）
+├── packageMember/         # 会员分包
+│   ├── work-orders/       # 工单状态
+│   ├── orders/            # 订单
+│   └── invoices/          # 发票
 ├── server/                # 后端 (Node.js + Express + Prisma)
 │   ├── prisma/
 │   │   ├── schema.prisma  # 数据库模型

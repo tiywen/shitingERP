@@ -35,7 +35,7 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: '石亭 ERP API' });
 });
 
-// 部署到服务器时建议 listen(PORT, '0.0.0.0') 以接受外网访问
-app.listen(PORT, () => {
-  console.log(`石亭 ERP 后端已启动: http://localhost:${PORT}`);
+// 绑定 0.0.0.0：真机通过局域网 IP 访问本机后端时才能连上（仅 localhost 时部分环境外网卡收不到）
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`石亭 ERP 后端已启动: http://localhost:${PORT}（局域网请用本机 IP:${PORT}）`);
 });

@@ -1,0 +1,54 @@
+<view class="mall-page">
+  <view class="mall-search">
+    <text class="mall-search-icon">🔍</text>
+    <text class="mall-search-placeholder">搜索商品（演示）</text>
+  </view>
+
+  <swiper class="mall-banner" indicator-dots autoplay circular interval="4000" duration="500">
+    <swiper-item>
+      <view class="banner-slide banner-a">
+        <text class="banner-title">石亭好物</text>
+        <text class="banner-sub">礼盒精选 · 把书院带回家</text>
+      </view>
+    </swiper-item>
+    <swiper-item>
+      <view class="banner-slide banner-b">
+        <text class="banner-title">茶叶礼盒</text>
+        <text class="banner-sub">¥20/盒 · 精美包装</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view class="section-head">
+    <text class="section-title">精选推荐</text>
+    <text class="section-more">更多即将上线</text>
+  </view>
+
+  <view class="goods-grid">
+    <view
+      wx:for="{{products}}"
+      wx:key="id"
+      class="goods-card"
+      data-id="{{item.id}}"
+      bindtap="onTapProduct"
+    >
+      <view class="goods-cover-wrap">
+        <image wx:if="{{item.cover}}" class="goods-cover" src="{{item.cover}}" mode="aspectFill" />
+        <view wx:else class="goods-cover goods-cover-ph goods-ph-tea">
+          <text class="goods-ph-icon">茶</text>
+          <text class="goods-ph-sub">礼盒装</text>
+        </view>
+        <view class="goods-tag" wx:if="{{item.tags && item.tags.length}}">{{item.tags[0]}}</view>
+      </view>
+      <view class="goods-info">
+        <text class="goods-name">{{item.name}}</text>
+        <text class="goods-subtitle">{{item.subtitle}}</text>
+        <view class="goods-row">
+          <text class="goods-price"><text class="yen">¥</text>{{item.price}}</text>
+          <text class="goods-unit">/{{item.unit}}</text>
+        </view>
+        <text class="goods-sales">{{item.salesText}}</text>
+      </view>
+    </view>
+  </view>
+</view>

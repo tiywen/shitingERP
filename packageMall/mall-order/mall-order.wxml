@@ -1,0 +1,53 @@
+<view class="order-page" wx:if="{{product}}">
+  <view class="order-card">
+    <view class="goods-line">
+      <view class="goods-thumb goods-ph-tea" wx:if="{{!product.cover}}">
+        <text class="thumb-t">茶</text>
+      </view>
+      <image wx:else class="goods-thumb" src="{{product.cover}}" mode="aspectFill" />
+      <view class="goods-meta">
+        <text class="goods-name">{{product.name}}</text>
+        <text class="goods-spec">¥{{product.price}}/{{product.unit}} · 精美包装</text>
+      </view>
+    </view>
+    <view class="qty-row">
+      <text class="qty-label">购买数量</text>
+      <view class="qty-ctrl">
+        <button class="qty-btn" bindtap="decQty">-</button>
+        <text class="qty-num">{{qty}}</text>
+        <button class="qty-btn" bindtap="incQty">+</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="order-card">
+    <view class="field-row">
+      <text class="field-label">收货人</text>
+      <input class="field-input" placeholder="请输入姓名" value="{{receiverName}}" bindinput="onNameInput" />
+    </view>
+    <view class="field-row">
+      <text class="field-label">手机号</text>
+      <input class="field-input" type="number" maxlength="11" placeholder="请输入手机号" value="{{receiverPhone}}" bindinput="onPhoneInput" />
+    </view>
+    <view class="field-row field-row-block">
+      <text class="field-label">收货地址</text>
+      <textarea class="field-textarea" placeholder="省市区 + 详细地址（演示可不填）" value="{{address}}" bindinput="onAddrInput" />
+    </view>
+    <view class="field-row field-row-block">
+      <text class="field-label">备注</text>
+      <textarea class="field-textarea" placeholder="如有特殊要求请填写" value="{{remark}}" bindinput="onRemarkInput" />
+    </view>
+  </view>
+
+  <view class="order-tip">
+    <text>本页为演示流程，提交后不会真实扣款；后续将对接支付与订单系统。</text>
+  </view>
+</view>
+
+<view class="order-bar safe-bottom">
+  <view class="bar-total">
+    <text class="total-label">合计</text>
+    <text class="total-price">¥{{total}}</text>
+  </view>
+  <button class="bar-submit" bindtap="onSubmit">提交订单</button>
+</view>

@@ -33,7 +33,12 @@ function request(options) {
         }
       },
       fail(err) {
-        reject(err);
+        const errMsg = err && (err.errMsg || err.message);
+        let msg = errMsg || '网络请求失败';
+        if (/fail|timeout|abort/i.test(String(msg)) && config.baseUrl && /localhost|127\.0\.0\.1/.test(config.baseUrl)) {
+          msg += '。真机无法访问本机 localhost，请在 config/index.js 将 baseUrl 改为电脑局域网 IP（与 server 端口一致）';
+        }
+        reject(new Error(msg));
       },
     });
   });

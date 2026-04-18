@@ -1,0 +1,284 @@
+/* 订房列表页 - 携程/去哪儿风格 */
+
+.container {
+  box-sizing: border-box;
+  padding: 0 0 140rpx;
+  min-height: 100vh;
+  background: var(--bg-page, #f5f5f5);
+}
+
+.header-block {
+  background: #fff;
+  padding: 24rpx 32rpx 28rpx;
+  margin-bottom: 16rpx;
+}
+
+.hotel-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.promo-tags {
+  margin-bottom: 16rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  font-size: 22rpx;
+  color: #ff6b35;
+  background: #fff5f0;
+  border-radius: 6rpx;
+  margin-right: 12rpx;
+}
+
+.date-guest-row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.date-cell {
+  flex: 1;
+  padding: 12rpx 0;
+}
+
+.date-weekday {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 4rpx;
+}
+
+.date-main {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.date-arrow {
+  margin: 0 16rpx;
+  font-size: 26rpx;
+  color: #ccc;
+}
+
+.nights-badge {
+  font-size: 26rpx;
+  color: #1890ff;
+  font-weight: 500;
+  margin-left: 16rpx;
+}
+
+.guest-row {
+  padding: 16rpx 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guest-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.filter-bar {
+  white-space: nowrap;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  margin-bottom: 16rpx;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.filter-chip {
+  flex-shrink: 0;
+  padding: 12rpx 28rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 32rpx;
+  margin-right: 16rpx;
+}
+
+.filter-chip.active {
+  color: #fff;
+  background: #1890ff;
+}
+
+.room-list {
+  padding: 0 24rpx;
+}
+
+.room-card {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.room-card-inner {
+  display: flex;
+  padding: 20rpx;
+}
+
+.room-img-wrap {
+  position: relative;
+  width: 220rpx;
+  height: 180rpx;
+  flex-shrink: 0;
+}
+
+.room-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12rpx;
+}
+
+.room-img-placeholder {
+  background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-img-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.room-img-badge {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  color: #fff;
+  background: #ff6b35;
+  border-radius: 6rpx;
+}
+
+.room-img-preview-hint {
+  position: absolute;
+  bottom: 8rpx;
+  right: 8rpx;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  color: #fff;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6rpx;
+}
+
+.room-info {
+  flex: 1;
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.room-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+}
+
+.room-id {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.room-meta {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+.room-policy {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 6rpx;
+}
+
+.room-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.room-price-wrap {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-original {
+  font-size: 24rpx;
+  color: #999;
+  text-decoration: line-through;
+  margin-right: 12rpx;
+}
+
+.price-current {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.price-unit {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 4rpx;
+}
+
+.btn-book {
+  padding: 12rpx 28rpx;
+  font-size: 26rpx;
+  color: #fff;
+  background: #1890ff;
+  border-radius: 8rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 80rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.float-contact {
+  position: fixed;
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
+  left: 24rpx;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background: #fff;
+  border-radius: 48rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+.float-icon-wrap {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1890ff;
+  border-radius: 50%;
+}
+
+.float-icon {
+  font-size: 28rpx;
+}
+
+.float-text {
+  font-size: 26rpx;
+  color: #333;
+}

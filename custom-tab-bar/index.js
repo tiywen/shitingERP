@@ -2,7 +2,7 @@ Component({
   data: {
     selected: 0,
     list: [
-      { pagePath: '/pages/index/index', text: '订房' },
+      { pagePath: '/pages/index/index', text: '首页' },
       { pagePath: '/pages/service/service', text: '服务' },
       { pagePath: '/pages/member/member', text: '会员' },
     ],

@@ -1,0 +1,47 @@
+<view class="detail-page" wx:if="{{product}}">
+  <swiper class="detail-swiper" indicator-dots circular bindchange="onSwiperChange">
+    <block wx:for="{{slides}}" wx:key="index">
+      <swiper-item>
+        <image wx:if="{{item.url}}" class="detail-slide-img" src="{{item.url}}" mode="aspectFill" />
+        <view wx:else class="detail-slide-ph {{item.phClass}}">
+          <text class="detail-ph-main">{{item.phTitle}}</text>
+          <text class="detail-ph-sub">{{item.phSub}}</text>
+        </view>
+      </swiper-item>
+    </block>
+  </swiper>
+  <view class="detail-indicator" wx:if="{{slides.length > 1}}">{{currentSlide + 1}} / {{slides.length}}</view>
+
+  <view class="detail-card">
+    <view class="detail-price-row">
+      <text class="detail-price"><text class="yen">¥</text>{{product.price}}</text>
+      <text class="detail-unit">/{{product.unit}}</text>
+      <text class="detail-sales">{{product.salesText}}</text>
+    </view>
+    <text class="detail-name">{{product.name}}</text>
+    <text class="detail-subtitle">{{product.subtitle}}</text>
+    <view class="detail-tags" wx:if="{{product.tags}}">
+      <text wx:for="{{product.tags}}" wx:key="*this" class="detail-tag">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="detail-card">
+    <view class="block-title">规格参数</view>
+    <view wx:for="{{product.specs}}" wx:key="label" class="spec-row">
+      <text class="spec-label">{{item.label}}</text>
+      <text class="spec-value">{{item.value}}</text>
+    </view>
+  </view>
+
+  <view class="detail-card">
+    <view class="block-title">商品详情</view>
+    <text class="detail-desc">{{product.desc}}</text>
+  </view>
+
+  <view class="detail-bottom-spacer"></view>
+</view>
+
+<view class="detail-bar safe-bottom">
+  <button class="bar-btn bar-cart" bindtap="onAddCartTip">加入购物车</button>
+  <button class="bar-btn bar-buy" bindtap="goBuy">立即购买</button>
+</view>
