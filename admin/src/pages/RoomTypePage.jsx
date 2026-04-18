@@ -155,7 +155,7 @@ export default function RoomTypePage() {
       <TablePage
         model="roomType"
         title="房型"
-        hiddenCols={['id', 'name', 'bedType', 'maxOccupancy', 'price', 'discountPrice', 'images']}
+        hiddenCols={['id', 'images']}
         multiSelect
         extraColumns={[
           { key: 'roomTypeImages', label: '房型图', render: renderRoomTypeImages },

@@ -718,6 +718,11 @@ router.delete('/:model/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error(err);
+    if (err.code === 'P2003') {
+      return res.status(409).json({
+        message: '该记录仍存在关联数据（如订单、房间、工单等），无法删除。请先处理关联数据后再试。',
+      });
+    }
     res.status(500).json({ message: err.message || '服务器错误' });
   }
 });

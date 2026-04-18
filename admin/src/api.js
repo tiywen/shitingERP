@@ -4,17 +4,36 @@
  */
 const BASE = '/api/admin';
 
+/** 解析 JSON；空 body 视为 {}，避免 DELETE 等接口返回空时 res.json() 抛 Unexpected end of JSON input */
+async function readJson(res) {
+  const text = await res.text();
+  if (!text || !String(text).trim()) {
+    if (!res.ok) throw new Error(`请求失败 (${res.status})`);
+    return {};
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    const snippet = String(text).slice(0, 160);
+    throw new Error(
+      res.ok
+        ? `服务器返回非 JSON：${snippet}`
+        : (snippet || `请求失败 (${res.status})`)
+    );
+  }
+}
+
 export async function fetchList(model) {
   const res = await fetch(`${BASE}/${model}`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
-  return data.list;
+  return data.list ?? [];
 }
 
 /** 餐厅预约列表（仅餐厅，含用户与状态中文） */
 export async function fetchRestaurantBookings() {
   const res = await fetch(`${BASE}/restaurant-bookings`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
   return data.list || [];
 }
@@ -22,7 +41,7 @@ export async function fetchRestaurantBookings() {
 /** 餐厅预约设置（每餐人数上限） */
 export async function fetchRestaurantSettings() {
   const res = await fetch(`${BASE}/restaurant-settings`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
   return data;
 }
@@ -34,7 +53,7 @@ export async function updateRestaurantSettings(body) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '更新失败');
   return data;
 }
@@ -42,7 +61,7 @@ export async function updateRestaurantSettings(body) {
 /** K歌房预约列表 */
 export async function fetchKtvBookings() {
   const res = await fetch(`${BASE}/ktv-bookings`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
   return data.list || [];
 }
@@ -50,14 +69,14 @@ export async function fetchKtvBookings() {
 /** 匹克球场预约列表 */
 export async function fetchPickleballBookings() {
   const res = await fetch(`${BASE}/pickleball-bookings`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
   return data.list || [];
 }
 
 export async function fetchOne(model, id) {
   const res = await fetch(`${BASE}/${model}/${id}`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '请求失败');
   return data;
 }
@@ -68,7 +87,7 @@ export async function create(model, data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  const result = await res.json();
+  const result = await readJson(res);
   if (!res.ok) throw new Error(result.message || '创建失败');
   return result;
 }
@@ -79,7 +98,7 @@ export async function update(model, id, data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  const result = await res.json();
+  const result = await readJson(res);
   if (!res.ok) throw new Error(result.message || '更新失败');
   return result;
 }
@@ -90,7 +109,7 @@ export async function importRoomTypes(rows) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ rows }),
   });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '导入失败');
   return data;
 }
@@ -102,14 +121,14 @@ export async function importFixedAssets(rows) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ rows }),
   });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '导入失败');
   return data;
 }
 
 export async function remove(model, id) {
   const res = await fetch(`${BASE}/${model}/${id}`, { method: 'DELETE' });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '删除失败');
   return data;
 }
@@ -127,7 +146,7 @@ export function getRoomTypeImageUrl(path) {
 
 export async function getRoomTypeImages(roomTypeId) {
   const res = await fetch(`${BASE}/roomType/${roomTypeId}/images`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '获取失败');
   return data.list;
 }
@@ -139,14 +158,14 @@ export async function uploadRoomTypeImage(roomTypeId, file) {
     method: 'POST',
     body: form,
   });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '上传失败');
   return data;
 }
 
 export async function deleteRoomTypeImage(roomTypeId, imageId) {
   const res = await fetch(`${BASE}/roomType/${roomTypeId}/images/${imageId}`, { method: 'DELETE' });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '删除失败');
   return data;
 }
@@ -159,7 +178,7 @@ export function getUploadUrl(path) {
 
 export async function getFixedAssetImages(fixedAssetId) {
   const res = await fetch(`${BASE}/fixedAsset/${fixedAssetId}/images`);
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '获取失败');
   return data.list;
 }
@@ -171,14 +190,14 @@ export async function uploadFixedAssetImage(fixedAssetId, file) {
     method: 'POST',
     body: form,
   });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '上传失败');
   return data;
 }
 
 export async function deleteFixedAssetImage(fixedAssetId, imageId) {
   const res = await fetch(`${BASE}/fixedAsset/${fixedAssetId}/images/${imageId}`, { method: 'DELETE' });
-  const data = await res.json();
+  const data = await readJson(res);
   if (!res.ok) throw new Error(data.message || '删除失败');
   return data;
 }
