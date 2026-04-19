@@ -1,8 +1,6 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import {
-  fetchList,
   importRoomTypes,
   getRoomTypeImageUrl,
   getRoomTypeImages,
@@ -16,7 +14,8 @@ const IMAGES_MAX = 10;
 export default function RoomTypePage() {
   const fileRef = useRef(null);
   const uploadImageRef = useRef(null);
-  const navigate = useNavigate();
+  /** 导入成功后递增，强制 TablePage 重新挂载并重新拉列表（避免 navigate(0)/整页 reload 导致白屏） */
+  const [tableKey, setTableKey] = useState(0);
   const [imageModalRow, setImageModalRow] = useState(null);
   const [modalImages, setModalImages] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -50,7 +49,7 @@ export default function RoomTypePage() {
 
       const res = await importRoomTypes(result);
       alert(res.message || `成功导入 ${res.created} 条`);
-      navigate(0);
+      setTableKey((k) => k + 1);
     } catch (err) {
       alert(err.message || '导入失败');
     } finally {
@@ -153,6 +152,7 @@ export default function RoomTypePage() {
         onChange={handleImport}
       />
       <TablePage
+        key={tableKey}
         model="roomType"
         title="房型"
         hiddenCols={['id', 'images']}

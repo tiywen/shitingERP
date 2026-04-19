@@ -72,6 +72,8 @@ const formExtraStyles = {
 export default function FixedAssetPage() {
   const fileRef = useRef(null);
   const uploadImageRef = useRef(null);
+  /** 导入成功后递增，强制 TablePage 重新拉列表（避免 location.reload 在 dev/公网下白屏） */
+  const [tableKey, setTableKey] = useState(0);
   const [imageModalRow, setImageModalRow] = useState(null);
   const [modalImages, setModalImages] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -146,7 +148,7 @@ export default function FixedAssetPage() {
 
       const res = await importFixedAssets(result);
       alert(res.message || `成功导入 ${res.created} 条`);
-      window.location.reload();
+      setTableKey((k) => k + 1);
     } catch (err) {
       alert(err.message || '导入失败');
     } finally {
@@ -245,6 +247,7 @@ export default function FixedAssetPage() {
         onChange={handleImport}
       />
       <TablePage
+        key={tableKey}
         model="fixedAsset"
         title="固定资产"
         multiSelect
